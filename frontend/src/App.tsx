@@ -2,48 +2,75 @@ import { useEffect, useState } from 'react';
 import { TutorFacade, type Tutor } from './services/TutorFacade';
 
 function App() {
-	const [tutores, setTutores] = useState<Tutor[]>([]);
-	const [erro, setErro] = useState<string>('');
+  const [tutores, setTutores] = useState<Tutor[]>([]);
 
-	useEffect(() => {
-		// Chama o Facade ao carregar a página
-		TutorFacade.getAll()
-			.then(dados => setTutores(dados))
-			.catch(err => {
-				console.error(err);
-				setErro('Erro ao conectar com a API. Verifique se o Docker está rodando.');
-			});
-	}, []);
+  // Carrega dados ao iniciar
+  useEffect(() => {
+    carregarTutores();
+  }, []);
 
-	return (
-		<div className="p-10 max-w-4xl mx-auto">
-			<h1 className="text-3xl font-bold mb-6 text-blue-600">
-				Teste do Sistema - Edital SEPLAG
-			</h1>
+  const carregarTutores = async () => {
+    try {
+      const dados = await TutorFacade.getAll();
+      setTutores(dados);
+    } catch (error) {
+      alert('Erro ao buscar tutores');
+    }
+  };
 
-			{erro && (
-				<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-					{erro}
-				</div>
-			)}
+  // Função para testar a criação (POST)
+  const criarTutorTeste = async () => {
+    const novoNome = prompt('Nome do novo tutor:');
+    if (!novoNome) return;
 
-			<div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-				<h2 className="text-xl font-semibold mb-4">Lista de Tutores (Vinda da API)</h2>
-				{tutores.length === 0 && !erro ? (
-					<p>Carregando...</p>
-				) : (
-					<ul className="space-y-2">
-						{tutores.map(tutor => (
-							<li key={tutor.id} className="p-3 border rounded hover:bg-gray-50 flex justify-between">
-								<span className="font-medium">{tutor.nome}</span>
-								<span className="text-gray-500 text-sm">{tutor.email}</span>
-							</li>
-						))}
-					</ul>
-				)}
-			</div>
-		</div>
-	);
+    try {
+      await TutorFacade.create({
+        nome: novoNome,
+        email: `${novoNome.toLowerCase().replace(/\s/g, '')}@teste.com`
+      });
+      // Recarrega a lista para mostrar o novo item
+      carregarTutores(); 
+    } catch (error) {
+      alert('Erro ao criar tutor');
+    }
+  };
+
+  const deletarTutor = async (id: number) => {
+    if(!confirm('Tem certeza?')) return;
+    await TutorFacade.delete(id);
+    carregarTutores();
+  }
+
+  return (
+    <div className="p-8 max-w-2xl mx-auto font-sans">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Gestão de Tutores</h1>
+        <button 
+          onClick={criarTutorTeste}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Adicionar Tutor
+        </button>
+      </div>
+
+      <div className="border rounded shadow-sm">
+        {tutores.map((tutor) => (
+          <div key={tutor.id} className="p-4 border-b last:border-b-0 flex justify-between items-center">
+            <div>
+              <p className="font-bold">{tutor.nome}</p>
+              <p className="text-sm text-gray-500">{tutor.email}</p>
+            </div>
+            <button 
+              onClick={() => deletarTutor(tutor.id)}
+              className="text-red-600 hover:text-red-800 text-sm"
+            >
+              Excluir
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default App;
