@@ -1,0 +1,10 @@
+{
+  "tutores": [
+    { "id": 1, "nome": "João Silva", "email": "joao@email.com" },
+    { "id": 2, "nome": "Maria Oliveira", "email": "maria@email.com" },
+    { "id": 3, "nome": "Carlos Santos", "email": "carlos@email.com" }
+  ],
+  "pets": [
+    { "id": 1, "nome": "Rex", "tipo": "Cachorro", "tutorId": 1 }
+  ]
+}

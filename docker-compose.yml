@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  # API Simulada (Cumpre o requisito de consumir API REST)
+  api:
+    build: ./mock-api
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  # Seu Front-End
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
