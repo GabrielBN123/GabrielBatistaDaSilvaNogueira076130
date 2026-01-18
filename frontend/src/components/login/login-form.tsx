@@ -6,7 +6,7 @@ import { Mail, Lock } from "lucide-react"
 
 import { LoginCard } from "./login-card"
 import { LoginHeader } from "./login-header"
-import { LoginInput } from "./login-input"
+import { Input } from "../ui/input"
 import { LoginButton } from "./login-button"
 import { ErrorMessage } from "../messages/error-message"
 import { CredentialsHint } from "./credentials-hint"
@@ -20,8 +20,6 @@ interface LoginFormProps {
 	defaultPassword?: string
 	onLogin?: (email: string, password: string) => Promise<boolean>
 }
-
-
 
 export function LoginForm({
 	title = "Acessar sistema",
@@ -93,7 +91,7 @@ export function LoginForm({
 			<ErrorMessage message={error} />
 
 			<form onSubmit={handleSubmit} className="space-y-5 mt-6">
-				<LoginInput
+				<Input
 					label="E-mail"
 					type="email"
 					value={email}
@@ -103,7 +101,7 @@ export function LoginForm({
 					required
 				/>
 
-				<LoginInput
+				<Input
 					label="Senha"
 					type="password"
 					value={password}

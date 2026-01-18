@@ -12,7 +12,7 @@ interface LoginInputProps {
   required?: boolean
 }
 
-export function LoginInput({
+export function Input({
   label,
   type,
   value,
