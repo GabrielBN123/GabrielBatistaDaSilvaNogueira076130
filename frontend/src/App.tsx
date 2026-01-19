@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import LoginPage from './pages/LoginPage';
-import { Dashboard } from './pages/Dashboard'; // Já vamos criar esse arquivo
+// import { Dashboard } from './pages/Dashboard';
+import { Suspense, lazy, type JSX } from 'react';
+
+const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.default })));
+const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
 
 // Componente para Proteger Rotas
 function PrivateRoute({ children }: { children: JSX.Element }) {
@@ -9,18 +12,21 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
+const Loading = () => <div className="flex h-screen items-center justify-center">Carregando...</div>;
+
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      
-      {/* Rotas Após o Login */}
-      <Route path="/" element={
-        <PrivateRoute>
-          <Dashboard />
-        </PrivateRoute>
-      } />
-    </Routes>
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/health" element={<div className="p-4 text-green-600">UP</div>} />
+        <Route path="/" element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        } />
+      </Routes>
+    </Suspense>
   );
 }
 
