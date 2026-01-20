@@ -1,19 +1,24 @@
-import { api } from './api';
+import { api } from '../services/api';
 
 // Tipagem forte (TypeScript exigido no edital)
 export interface Tutor {
   id: number;
   nome: string;
   email: string;
+  telefone?: string;
+  cidade?: string;
 }
 
 // O Facade abstrai a complexidade das rotas
 export class TutorFacade {
   
   // GET: Listar todos
-  static async getAll(): Promise<Tutor[]> {
-    const response = await api.get<Tutor[]>('/tutores');
-    return response.data;
+  static async getAll(page = 1, limit = 5): Promise<{ data: Tutor[]; total: number }> {
+    const response = await api.get<Tutor[]>('/tutores', { params: { page, limit } });
+    return {
+      data: response.data,
+      total: Number(response.headers['x-total-count'] || 0)
+    };
   }
 
   // GET: Buscar por ID (para edição)
