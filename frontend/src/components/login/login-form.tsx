@@ -16,19 +16,19 @@ import { useNavigate } from "react-router-dom"
 interface LoginFormProps {
 	title?: string
 	subtitle?: string
-	defaultEmail?: string
+	defaultUsername?: string
 	defaultPassword?: string
-	onLogin?: (email: string, password: string) => Promise<boolean>
+	onLogin?: (username: string, password: string) => Promise<boolean>
 }
 
 export function LoginForm({
 	title = "Acessar sistema",
 	subtitle = "Faça seu login",
-	defaultEmail = "admin@mt.gov.br",
-	defaultPassword = "123456",
+	defaultUsername = "admin",
+	defaultPassword = "admin",
 	onLogin,
 }: LoginFormProps) {
-	const [email, setEmail] = useState(defaultEmail);
+	const [username, setUsername] = useState(defaultUsername);
 	const [password, setPassword] = useState(defaultPassword);
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -36,9 +36,9 @@ export function LoginForm({
 	const navigate = useNavigate();
 
 	// Eliminar aviso de erro ao digitar no e-mail
-	const handleEmailChange = (val: string) => {
+	const handleUsernameChange = (val: string) => {
         setError("");
-        setEmail(val);
+        setUsername(val);
     }
 
 	// Eliminar aviso de erro ao digitar na senha
@@ -48,18 +48,16 @@ export function LoginForm({
     }
 
 	const validateForm = (): boolean => {
-        if (!email || !password) {
+        if (!username || !password) {
             setError("Por favor, preencha todos os campos.")
             return false;
         }
-        // Regex simples para validar formato de e-mail
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setError("Insira um endereço de e-mail válido.")
+        if (username.length < 1) {
+            setError("Insira um nome de usuário válido.")
             return false;
         }
-        if (password.length < 6) {
-            setError("A senha deve ter pelo menos 6 caracteres.")
+        if (password.length < 1) {
+            setError("A senha deve ter pelo menos 1 caractere.")
             return false;
         }
         return true;
@@ -75,10 +73,10 @@ export function LoginForm({
 
 		setTimeout(async () => {
 			try {
-				await signIn(email, password);
+				await signIn(username, password);
 				navigate('/'); // Redireciona para home após sucesso
 			} catch (err) {
-				setError('E-mail ou senha incorretos.');
+				setError('Nome de usuário ou senha incorretos.');
 			}
 			setIsLoading(false)
 		}, 1000)
@@ -92,11 +90,11 @@ export function LoginForm({
 
 			<form onSubmit={handleSubmit} className="space-y-5 mt-6">
 				<Input
-					label="E-mail"
-					type="email"
-					value={email}
-					onChange={handleEmailChange}
-					placeholder="seu@email.com"
+					label="Nome de Usuário"
+					type="text"
+					value={username}
+					onChange={handleUsernameChange}
+					placeholder="nomeusuario"
 					icon={Mail}
 					required
 				/>
@@ -114,7 +112,7 @@ export function LoginForm({
 				<LoginButton isLoading={isLoading} />
 			</form>
 
-			<CredentialsHint email={defaultEmail} password={defaultPassword} />
+			<CredentialsHint username={defaultUsername} password={defaultPassword} />
 		</LoginCard>
 	)
 }

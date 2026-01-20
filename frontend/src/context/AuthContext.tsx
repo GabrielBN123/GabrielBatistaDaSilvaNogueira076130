@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { AuthFacade, type User } from '../services/AuthFacade';
+import { AuthFacade, type User } from '../facades/AuthFacade';
 
 interface AuthContextType {
     user: User | null;
@@ -9,34 +9,33 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const { Provider } = AuthContext;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(AuthFacade.getUser());
 
-    // Ao recarregar a página, verifica se já tem login salvo
     useEffect(() => {
-        const currentUser = AuthFacade.getUser();
-        if (currentUser) {
-            setUser(currentUser);
-        }
+        const subscription = AuthFacade.user$.subscribe((newUser) => {
+            setUser(newUser);
+        });
+        return () => subscription.unsubscribe();
     }, []);
 
     async function signIn(email: string, pass: string) {
-        const response = await AuthFacade.login(email, pass);
-        setUser(response.user);
+        await AuthFacade.login(email, pass);
     }
 
     function signOut() {
         AuthFacade.logout();
-        setUser(null);
     }
 
+    const isAuth = !!user || AuthFacade.isAuthenticated();
+
     return (
-        <AuthContext.Provider value={{ user, signIn, signOut, isAuthenticated: !!user }}>
+        <Provider value={{ user, signIn, signOut, isAuthenticated: isAuth }}>
             { children }
-        </AuthContext.Provider>
+        </Provider>
     );
 }
 
-// Hook personalizado para facilitar o uso
 export const useAuth = () => useContext(AuthContext);

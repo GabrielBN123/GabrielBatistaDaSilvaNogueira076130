@@ -6,8 +6,8 @@ export default function LoginPage() {
       <LoginForm
         title="Acessar o Sistema"
         subtitle="Faça seu login"
-        defaultEmail="admin@mt.gov.br"
-        defaultPassword="123456"
+        defaultUsername="admin"
+        defaultPassword="admin"
       />
     </div>
   )
