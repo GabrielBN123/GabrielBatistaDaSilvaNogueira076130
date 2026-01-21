@@ -84,7 +84,7 @@ export class AuthFacade {
 
     try {
       const response = await api.post<LoginResponse>('/autenticacao/refresh', { 
-        refresh_token: refreshToken 
+        refresh_token: refreshToken
       });
 
       const { access_token, refresh_token: newRefreshToken } = response.data;
