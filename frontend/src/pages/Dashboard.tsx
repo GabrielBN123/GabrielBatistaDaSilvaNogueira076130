@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type ChangeEvent } from 'react';
 // import { TutorFacade, type Tutor } from '../facades/TutorFacade';
 import { PetFacade, type Pet } from '@/facades/PetFacade';
 import { useAuth } from '@/context/AuthContext';
@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { PetCard, PetCardSkeleton } from '@/components/dashboard/pet-card';
 import { CustomPagination } from '@/components/ui/custom-pagination';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 export function Dashboard() {
 	const { user, signOut } = useAuth();
@@ -17,27 +19,29 @@ export function Dashboard() {
 	const [pets, setPets] = useState<Pet[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [nome, setNome] = useState('');
+	const [raca, setRaca] = useState('');
 	const [page, setPage] = useState(0);
 	const [total, setTotal] = useState(0);
 	const [pageCount, setPageCount] = useState(0);
-	const ITENS_POR_PAGINA = 5;
+	const ITENS_POR_PAGINA = 10;
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		carregarDados();
-	}, [page]); // Recarrega sempre que a página mudar
+	}, [page, nome, raca]); // Recarrega sempre que a página mudar
 
 	async function carregarDados() {
 		setLoading(true);
 		try {
-			// const { data, total } = await TutorFacade.getAll(nome, page, ITENS_POR_PAGINA);
-			const { data, total } = await PetFacade.getAll(page, ITENS_POR_PAGINA);
-			console.log("Dados carregados:", data.content);
-			setPets(data.content);
+			const { data, total } = await PetFacade.getAll(nome, page, raca, ITENS_POR_PAGINA);
+			
+			const listaPets = data.content ? data.content : data;
+			setPets(listaPets);
 			setPageCount(Math.ceil(total / ITENS_POR_PAGINA));
 			setTotal(total);
 		} catch (error) {
 			console.error("Erro ao buscar dados", error);
+			setError("Não foi possível carregar os pets.");
 		} finally {
 			setLoading(false);
 		}
@@ -53,6 +57,13 @@ export function Dashboard() {
 		},
 		[pageCount]
 	);
+
+	// Função para lidar com a busca e resetar para página 0
+    const handleSearch = (val: string) => {
+		// console.log("Filtrando por nome:", e);
+        setNome(val);
+        setPage(0); // Volta para a primeira página ao filtrar
+    };
 
 	return (
 		<div className="min-h-screen min-w-screen bg-gradient-to-b from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
@@ -74,11 +85,36 @@ export function Dashboard() {
 
 						{!loading && !error && (
 						<Badge variant="secondary" className="text-base px-4 py-2">
-							{pets.length} {pets.length === 1 ? "pet" : "pets"}
+							{total} {total === 1 ? "pet" : "pets"}
 						</Badge>
 						)}
 					</CardHeader>
-
+					
+					<CardContent className="space-y-4">
+						{/* Área de Filtro e Badge */}
+						<div className="flex items-center gap-3 w-full md:w-auto">
+							<div className="relative w-full md:w-64">
+								<Input
+									label="Nome do Cão"
+									type="text"
+									value={nome}
+									onChange={handleSearch}
+									placeholder="nomeusuario"
+									icon={Search}
+									required
+								/>
+								{/* <Input icon={Search} label='Nome' type='text' placeholder="Buscar pet pelo nome..." value={nome} onChange={handleSearch}/> */}
+							</div>
+						</div>
+					</CardContent>
+					<div className="w-100 px-6 text-right d-flex justify-end">
+						{!loading && !error && (
+							<Badge variant="secondary" className="hidden md:flex text-base px-4 py-2 whitespace-nowrap">
+								{total} {total === 1 ? "pet" : "pets"}
+							</Badge>
+						)}
+					</div>
+					
 					<CardContent className="space-y-4">
 						{loading && (
 						<div className="space-y-4">
@@ -113,7 +149,7 @@ export function Dashboard() {
 						)}
 
 						{!loading && !error && pets.length > 0 && (
-						<div className="space-y-4">
+						<div className="space-y-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 							{pets.map((pet) => (
 								<PetCard key={pet.id} pet={pet} />
 							))}
