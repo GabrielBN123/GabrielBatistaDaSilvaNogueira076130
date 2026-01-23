@@ -18,12 +18,41 @@ export interface Pet {
 
 export class PetFacade {
 
-  static async getAll(page = 1, limit = 5): Promise<{ data: Pet[]; total: number }> {
-    const response = await api.get<Pet[]>('/v1/pets', { params: { page, limit } });
+  static async getAll(nome = '', page = 0, raca = '', limit = 10): Promise<{ data: Pet[]; total: number }> {
+
+    // Cria o objeto de parâmetros
+    const params: any = { 
+      page, 
+      limit 
+    };
+
+    // Só adiciona o nome nos parâmetros se ele não estiver vazio
+    if (nome) {
+      params.nome = nome; // Ou 'name', verifique como seu Back-end espera receber isso
+    }
+
+    // Só adiciona a raça nos parâmetros se ela não estiver vazia
+    if (raca) {
+      params.raca = raca; // Ou 'breed', verifique como seu Back-end espera receber isso
+    }
+
+    const response = await api.get('/v1/pets', { params });
+
+    console.log("Resposta da API:", response);
+
     return {
       data: response.data,
-      total: Number(response.headers['x-total-count'] || 0)
+      total: response.data.total || 'Não foram encontrados'
+      // total: response.data.content.length || 'Não foram encontrados'
     };
+
+    // const response = await api.get<Pet[]>('/v1/pets', { 
+    //   params: { nome, page, raca, limit } 
+    // });
+    // return {
+    //   data: response.data,
+    //   total: Number(response.headers['x-total-count'] || 0)
+    // };
   }
 
   static async create(data: Omit<Pet, 'id'>): Promise<Pet> {
