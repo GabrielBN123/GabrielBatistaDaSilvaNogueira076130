@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 // import { Dashboard } from './pages/Dashboard';
 import { Suspense, lazy, type JSX } from 'react';
+import { Detalhe } from './pages/Pets/Detalhe';
 
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.default })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -25,6 +26,14 @@ function AppRoutes() {
             <Dashboard />
           </PrivateRoute>
         } />
+        <Route 
+          path="/pets/:id" 
+          element={
+            <PrivateRoute>
+              <Detalhe />
+            </PrivateRoute>
+          } 
+        />
       </Routes>
     </Suspense>
   );
