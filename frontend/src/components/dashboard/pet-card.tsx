@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from 'react-router-dom'; // Importação para navegação
 
 export interface Pet {
   id: number;
@@ -34,8 +35,15 @@ function formatIdade(idade: number): string {
 }
 
 export function PetCard({ pet }: PetCardProps) {
+
+  const navigate = useNavigate();
+
+  const handlePetClick = (petId: string | number) => {
+    navigate(`/pets/${petId}`); // Rota de detalhamento
+  };
+
   return (
-    <Card className="hover:scale-[1.02] transition-transform duration-200 cursor-pointer">
+    <Card className="hover:scale-[1.02] transition-transform duration-200 cursor-pointer" onClick={() => handlePetClick(pet.id)}>
       <CardContent className="flex items-center gap-4">
         <Avatar className="size-16 bg-secondary">
           {pet.foto ? (

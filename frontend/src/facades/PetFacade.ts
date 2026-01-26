@@ -1,5 +1,22 @@
 import { api } from '../services/api';
 
+interface Foto {
+  id: number;
+  nome: string;
+  contentType: string;
+  url: string;
+}
+
+interface Tutor {
+  id: number;
+  nome: string;
+  email: string;
+  telefone: string;
+  endereco: string;
+  cpf: string | null;
+  foto: Foto | null;
+}
+
 export interface Pet {
   page: number;
   size: number;
@@ -14,6 +31,14 @@ export interface Pet {
       foto: null
     },
   ];
+}
+interface PetDetalhe {
+  id: number;
+  nome: string;
+  raca: string;
+  idade: number;
+  foto: Foto | null;
+  tutores: Tutor[];
 }
 
 export class PetFacade {
@@ -38,21 +63,16 @@ export class PetFacade {
 
     const response = await api.get('/v1/pets', { params });
 
-    console.log("Resposta da API:", response);
-
     return {
       data: response.data,
       total: response.data.total || 'Não foram encontrados'
       // total: response.data.content.length || 'Não foram encontrados'
     };
+  }
 
-    // const response = await api.get<Pet[]>('/v1/pets', { 
-    //   params: { nome, page, raca, limit } 
-    // });
-    // return {
-    //   data: response.data,
-    //   total: Number(response.headers['x-total-count'] || 0)
-    // };
+  static async getById(id: number | string): Promise<Pet> {
+      const response = await api.get(`/v1/pets/${id}`);
+      return response.data;
   }
 
   static async create(data: Omit<Pet, 'id'>): Promise<Pet> {
