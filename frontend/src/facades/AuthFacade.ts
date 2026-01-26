@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { jwtDecode } from "jwt-decode"; // Importação nova
 import { api } from "../services/api";
+import axios from 'axios';
 
 export interface User {
   id: number;
@@ -35,7 +36,7 @@ export class AuthFacade {
   public static user$ = AuthFacade.userSubject.asObservable();
 
   // --- TRATAMENTO SEGURO DE ERRO NO JSON.PARSE ---
-  private static getUserFromStorage(): User | null {
+  public static getUserFromStorage(): User | null {
     try {
       const data = localStorage.getItem(AuthFacade.USER_KEY);
       return data ? JSON.parse(data) : null;
@@ -49,7 +50,7 @@ export class AuthFacade {
   static async login(username: string, password: string): Promise<User> {
     // 1. Post na API
     const response = await api.post<LoginResponse>('/autenticacao/login', { username, password });
-    
+
     // A API retorna apenas tokens, sem o objeto user explícito
     const { access_token, refresh_token } = response.data;
 
@@ -77,13 +78,15 @@ export class AuthFacade {
 
   static async refreshSession(): Promise<string | null> {
     const refreshToken = this.getRefreshToken();
-    
+
     if (!refreshToken) {
       return null;
     }
 
     try {
-      const response = await api.put<LoginResponse>('/autenticacao/refresh', {}, {
+      const baseURL = 'https://pet-manager-api.geia.vip';
+
+      const response = await axios.put<LoginResponse>(`${baseURL}/autenticacao/refresh`, {}, {
         headers: {
           Authorization: `Bearer ${refreshToken}`
         }
@@ -93,7 +96,7 @@ export class AuthFacade {
 
       // Atualiza os tokens no armazenamento
       localStorage.setItem(this.ACCESS_TOKEN_KEY, access_token);
-      
+
       // Algumas APIs retornam um novo refresh token, outras mantém o mesmo.
       // Se vier um novo, salvamos.
       if (newRefreshToken) {
@@ -119,6 +122,19 @@ export class AuthFacade {
   static getAccessToken(): string | null {
     return localStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
+
+  static isTokenValid(): boolean {
+    const token = localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    if (!token) return false;
+
+    try {
+        const decoded = jwtDecode<any>(token);
+        const currentTime = Date.now() / 1000;
+        return decoded.exp > (currentTime + 10);
+    } catch (error) {
+        return false;
+    }
+}
 
   static getRefreshToken(): string | null {
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
