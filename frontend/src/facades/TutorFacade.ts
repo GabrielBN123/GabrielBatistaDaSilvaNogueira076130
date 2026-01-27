@@ -1,29 +1,68 @@
 import { api } from '../services/api';
 
-// Tipagem forte (TypeScript exigido no edital)
-export interface Tutor {
+interface Foto {
+  id: number;
+  nome: string;
+  contentType: string;
+  url: string;
+}
+
+interface Tutor {
   id: number;
   nome: string;
   email: string;
-  telefone?: string;
-  cidade?: string;
+  telefone: string;
+  endereco: string;
+  cpf: string | null;
+  foto: Foto | null;
+  pet: Pet[] | null
+}
+export interface TutorPaginatedResponse {
+  page: number;
+  size: number;
+  total: number;
+  pageCount: number;
+  content: Tutor[];
+}
+
+export interface Pet {
+  id: number;
+  nome: string;
+  raca: string;
+  idade: number;
+  foto?: {
+    id: number;
+    nome: string;
+    url: string;
+  } | null;
 }
 
 // O Facade abstrai a complexidade das rotas
 export class TutorFacade {
-  
-  // GET: Listar todos
-  static async getAll(nome = '',page = 1, limit = 5): Promise<{ data: Tutor[]; total: number }> {
-    const response = await api.get<Tutor[]>('/v1/tutores', { params: {nome, page, limit } });
+
+  static async getAll(nome = '', page = 0, limit = 10): Promise<{ data: TutorPaginatedResponse[]; total: number }> {
+
+    const params: any = {
+      page,
+      limit
+    };
+
+    if (nome) {
+      params.nome = nome;
+    }
+
+    const response = await api.get<Tutor[]>('/v1/tutores', { params });
+
     return {
       data: response.data,
-      total: Number(response.headers['x-total-count'] || 0)
+      total: response.data.total || 'Não foram encontrados'
     };
   }
 
   // GET: Buscar por ID (para edição)
-  static async getById(id: number): Promise<Tutor> {
+  static async getById(id: number | string): Promise<Tutor> {
     const response = await api.get<Tutor>(`/v1/tutores/${id}`);
+    console.log('DADOS', response);
     return response.data;
   }
 
