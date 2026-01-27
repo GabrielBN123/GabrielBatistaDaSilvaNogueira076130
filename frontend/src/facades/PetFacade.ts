@@ -1,4 +1,4 @@
-import { api } from '../services/api';
+import { api } from '@/services/api';
 
 interface Foto {
   id: number;
@@ -17,48 +17,44 @@ interface Tutor {
   foto: Foto | null;
 }
 
-export interface Pet {
+export interface PetPaginatedResponse {
   page: number;
   size: number;
   total: number;
   pageCount: number;
-  content: [
-    {
-      id: number,
-      nome: string,
-      raca: string,
-      idade: number,
-      foto: null
-    },
-  ];
+  content: Pet[];
 }
-interface PetDetalhe {
+
+export interface Pet {
   id: number;
   nome: string;
   raca: string;
   idade: number;
-  foto: Foto | null;
-  tutores: Tutor[];
+  foto?: {
+    id: number;
+    nome: string;
+    url: string;
+  } | null;
 }
+
+export type PetCreateDTO = Omit<Pet, 'id' | 'foto'>;
 
 export class PetFacade {
 
-  static async getAll(nome = '', page = 0, raca = '', limit = 10): Promise<{ data: Pet[]; total: number }> {
+  static async getAll(nome = '', page = 0, raca = '', limit = 10): Promise<{ data: PetPaginatedResponse[]; total: number }> {
 
     // Cria o objeto de parâmetros
-    const params: any = { 
-      page, 
-      limit 
+    const params: any = {
+      page,
+      limit
     };
 
-    // Só adiciona o nome nos parâmetros se ele não estiver vazio
     if (nome) {
-      params.nome = nome; // Ou 'name', verifique como seu Back-end espera receber isso
+      params.nome = nome;
     }
 
-    // Só adiciona a raça nos parâmetros se ela não estiver vazia
     if (raca) {
-      params.raca = raca; // Ou 'breed', verifique como seu Back-end espera receber isso
+      params.raca = raca;
     }
 
     const response = await api.get('/v1/pets', { params });
@@ -66,24 +62,42 @@ export class PetFacade {
     return {
       data: response.data,
       total: response.data.total || 'Não foram encontrados'
-      // total: response.data.content.length || 'Não foram encontrados'
     };
   }
 
   static async getById(id: number | string): Promise<Pet> {
-      const response = await api.get(`/v1/pets/${id}`);
-      return response.data;
+    const response = await api.get(`/v1/pets/${id}`);
+    return response.data;
   }
 
-  static async create(data: Omit<Pet, 'id'>): Promise<Pet> {
+  static async create(data: PetCreateDTO): Promise<Pet> {
     const response = await api.post<Pet>('/v1/pets', data);
     return response.data;
+  }
+
+  static async update(id: number, data: PetCreateDTO): Promise<Pet> {
+    const response = await api.put<Pet>(`/v1/pets/${id}`, data);
+    return response.data;
+  }
+
+  static async uploadImage(id: number, file: File): Promise<void> {
+    const formData = new FormData();
+    console.log(file);
+    formData.append('foto', file);
+    await api.post(`/v1/pets/${id}/fotos`, formData, {
+      headers: {
+        'Content-type': 'multpart/form-data',
+      },
+      transformRequest: (data, headers) => {
+        return data;
+      }
+    });
   }
 
   static async delete(id: number): Promise<void> {
     await api.delete(`/v1/pets/${id}`);
   }
-  
+
   // Busca pets de um tutor específico (útil para detalhes)
   static async getByTutorId(tutorId: number): Promise<Pet[]> {
     const response = await api.get<Pet[]>(`/v1/pets?tutorId=${tutorId}`);
