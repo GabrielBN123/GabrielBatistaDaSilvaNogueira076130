@@ -6,6 +6,8 @@ import { PetDetalhe } from './pages/Pets/PetDetalhe';
 import { PetForm } from './pages/Pets/PetForm';
 import { TutorList } from './pages/Tutores/TutorList';
 import { TutorDetalhe } from './pages/Tutores/TutorDetalhe';
+import { TutorForm } from './pages/Tutores/TutorForm';
+import { PetList } from './pages/Pets/PetList';
 
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.default })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -29,41 +31,47 @@ function AppRoutes() {
             <Dashboard />
           </PrivateRoute>
         } />
+        <Route path="/pets" element={
+          <PrivateRoute>
+            <PetList />
+          </PrivateRoute>
+        } />
         <Route path="/tutores" element={
           <PrivateRoute>
             <TutorList />
           </PrivateRoute>
         } />
-        {/* Rota para CRIAR (deve vir antes das rotas com :id para evitar conflito) */}
-        <Route 
-          path="/pets/novo" 
-          element={
+        <Route path="/pets/novo" element={
             <PrivateRoute>
               <PetForm />
             </PrivateRoute>
           } 
         />
-
-        {/* Rota para EDITAR (Reaproveita o mesmo componente) */}
-        <Route 
-          path="/pets/editar/:id" 
-          element={
+        <Route path="/tutores/novo" element={
+            <PrivateRoute>
+              <TutorForm />
+            </PrivateRoute>
+          } 
+        />
+        <Route path="/pets/editar/:id" element={
             <PrivateRoute>
               <PetForm />
             </PrivateRoute>
           } 
         />
-        <Route 
-          path="/pets/:id" 
-          element={
+        <Route path="/tutores/editar/:id" element={
+            <PrivateRoute>
+              <TutorForm />
+            </PrivateRoute>
+          } 
+        />
+        <Route path="/pets/:id" element={
             <PrivateRoute>
               <PetDetalhe />
             </PrivateRoute>
           } 
         />
-        <Route 
-          path="/tutores/:id" 
-          element={
+        <Route path="/tutores/:id" element={
             <PrivateRoute>
               <TutorDetalhe />
             </PrivateRoute>

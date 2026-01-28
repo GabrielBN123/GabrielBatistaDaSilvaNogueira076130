@@ -281,7 +281,7 @@ export function PetDetalhe() {
                     {pet.tutores && pet.tutores.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {pet.tutores.map((tutor) => (
-                                <Card key={tutor.id} className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                                <Card key={tutor.id} className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer" onClick={() => navigate(`/tutores/${tutor.id}`)} >
                                     <CardHeader className="flex flex-row items-center gap-4 pb-3">
                                         <Avatar className="h-14 w-14 border-2 border-white shadow-md">
                                             {tutor.foto?.url ? (

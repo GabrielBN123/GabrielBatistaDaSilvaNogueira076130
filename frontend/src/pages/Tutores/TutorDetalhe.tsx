@@ -147,7 +147,7 @@ export function TutorDetalhe() {
                             variant="destructive"
                             onClick={handleExcluir}
                             disabled={deleting}
-                            className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600"
+                            className="flex-1 text-stone-700 dark:text-stone-200 sm:flex-none bg-red-500 hover:bg-red-600"
                         >
                             {deleting ? (
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -267,7 +267,7 @@ export function TutorDetalhe() {
                             </h2>
                         </div>
 
-                        <Button onClick={handleAdicionarPet} className="gap-2 bg-primary hover:bg-primary/90 shadow-md shadow-amber-900/20">
+                        <Button onClick={handleAdicionarPet} className="gap-2 bg-primary text-stone-800 dark:text-stone-100 hover:bg-primary/90 shadow-md shadow-amber-900/20">
                             <Plus className="w-4 h-4" />
                             Adicionar Pet
                         </Button>
