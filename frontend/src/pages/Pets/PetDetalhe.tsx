@@ -112,11 +112,9 @@ export function PetDetalhe() {
     };
 
     const handleCadastrarTutor = () => {
-        // Navega para a tela de vínculo ou cadastro de tutor
-        navigate(`/pets/${id}/tutores/novo`); 
+        navigate(`/pets/${id}/tutor/novo`); 
     };
 
-    // --- Renderização de Loading ---
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-b from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4">

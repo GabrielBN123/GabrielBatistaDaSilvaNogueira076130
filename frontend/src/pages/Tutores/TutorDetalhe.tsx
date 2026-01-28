@@ -83,7 +83,7 @@ export function TutorDetalhe() {
 
     const handleAdicionarPet = () => {
         // Lógica para vincular um pet novo ou existente
-        navigate(`/tutores/${id}/pets/novo`);
+        navigate(`/tutores/${id}/pet/novo`);
     };
 
     // --- Loading State ---
