@@ -8,6 +8,7 @@ import { TutorList } from './pages/Tutores/TutorList';
 import { TutorDetalhe } from './pages/Tutores/TutorDetalhe';
 import { TutorForm } from './pages/Tutores/TutorForm';
 import { PetList } from './pages/Pets/PetList';
+import { VinculoManager } from './pages/Vinculos/VinculoManager';
 
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.default })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
@@ -74,6 +75,18 @@ function AppRoutes() {
         <Route path="/tutores/:id" element={
             <PrivateRoute>
               <TutorDetalhe />
+            </PrivateRoute>
+          } 
+        />
+        <Route path="/tutores/:id/pet/novo" element={
+            <PrivateRoute>
+              <VinculoManager />
+            </PrivateRoute>
+          } 
+        />
+        <Route path="/pets/:id/tutor/novo" element={
+            <PrivateRoute>
+              <VinculoManager />
             </PrivateRoute>
           } 
         />
