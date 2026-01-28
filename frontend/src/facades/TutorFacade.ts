@@ -51,7 +51,9 @@ export class TutorFacade {
       params.nome = nome;
     }
 
-    const response = await api.get<Tutor[]>('/v1/tutores', { params });
+    const response = await api.get('/v1/tutores', { params });
+    console.log('LOG: ', response);
+    
 
     return {
       data: response.data,
@@ -71,6 +73,16 @@ export class TutorFacade {
   static async create(data: Omit<Tutor, 'id'>): Promise<Tutor> {
     const response = await api.post<Tutor>('/v1/tutores', data);
     return response.data;
+  }
+
+  static async uploadImage(id: number, file: File): Promise<void> {
+    const formData = new FormData();
+    formData.append('foto', file); // Ou 'file', verifique o Swagger
+
+    await api.post(`/v1/tutores/${id}/fotos`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      transformRequest: (data) => data
+    });
   }
 
   // PUT: Atualizar existente
