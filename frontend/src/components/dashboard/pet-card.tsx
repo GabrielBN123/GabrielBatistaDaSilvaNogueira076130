@@ -38,12 +38,8 @@ export function PetCard({ pet }: PetCardProps) {
 
   const navigate = useNavigate();
 
-  const handlePetClick = (petId: string | number) => {
-    navigate(`/pets/${petId}`); // Rota de detalhamento
-  };
-
   return (
-    <Card className="hover:scale-[1.02] transition-transform duration-200 cursor-pointer" onClick={() => handlePetClick(pet.id)}>
+    <Card className="hover:scale-[1.02] transition-transform duration-200 cursor-pointer">
       <CardContent className="flex items-center gap-4">
         <Avatar className="size-16 bg-secondary">
           {pet.foto ? (
