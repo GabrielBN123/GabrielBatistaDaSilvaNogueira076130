@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TutorFacade } from '@/facades/TutorFacade'; // Ajuste o import
-import { useAuth } from '@/context/AuthContext';
-import { Header } from '@/components/ui/header';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     ArrowLeft,
@@ -22,16 +19,21 @@ import {
     PawPrint,
     Loader2
 } from 'lucide-react';
+import { Loading } from '@/components/ui/loading';
+import { TutorPetFacade } from '@/facades/TutorPetFacade';
+import { toast } from 'react-toastify';
+import { useConfirm } from '@/context/ModalContext';
+import type { Tutor } from '@/interfaces/tutor.interface';
 
 export function TutorDetalhe() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { signOut } = useAuth();
 
-    const [tutor, setTutor] = useState<TutorDetalheData | null>(null);
+    const [tutor, setTutor] = useState<Tutor | null>(null);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     useEffect(() => {
         if (id) {
@@ -44,7 +46,7 @@ export function TutorDetalhe() {
         try {
             const data = await TutorFacade.getById(Number(tutorId));
             console.log('DETALHES', data);
-            
+
             setTutor(data);
         } catch (err) {
             console.error('ERRO');
@@ -55,8 +57,6 @@ export function TutorDetalhe() {
         }
     }
 
-    // --- Ações ---
-
     const handleVoltar = () => navigate(-1);
 
     const handleEditar = () => {
@@ -64,51 +64,64 @@ export function TutorDetalhe() {
     };
 
     const handleExcluir = async () => {
-        const confirmou = window.confirm(`Tem certeza que deseja remover o tutor ${tutor?.nome}?`);
+        confirm({
+            title: "Remover Tutor?",
+            description: `Tem certeza que deseja remover o tutor ${tutor?.nome}?`,
+            variant: "destructive",
+            confirmText: "Sim, remover",
 
-        if (confirmou && id) {
-            setDeleting(true);
-            try {
-                await TutorFacade.delete(Number(id));
-                alert('Tutor removido com sucesso.');
-                navigate('/tutores');
-            } catch (error) {
-                console.error(error);
-                alert('Erro ao excluir o tutor.');
-            } finally {
-                setDeleting(false);
+            onConfirm: async () => {
+                if (id) {
+                    setDeleting(true);
+                    try {
+                        await TutorFacade.delete(Number(id));
+                        toast.success('Tutor removido com sucesso.');
+                    } catch (error) {
+                        console.error(error);
+                        toast.error('Erro ao excluir o tutor.');
+                    } finally {
+                        setDeleting(false);
+                    }
+                }
             }
-        }
+        })
+    };
+
+    async function desvincular(petId: number) {
+        confirm({
+            title: "Desvincular Pet?",
+            description: "Tem certeza? O pet não será excluído, apenas o vínculo será removido.",
+            variant: "destructive",
+            confirmText: "Sim, remover",
+
+            onConfirm: async () => {
+                if (id && petId) {
+                    setDeleting(true);
+                    try {
+                        await TutorPetFacade.unlink(Number(tutor.id), Number(petId));
+                        toast.success('Pet desvinculado.');
+                    } catch (error) {
+                        console.error(error);
+                        toast.error('Erro ao desvincular o pet.');
+                    } finally {
+                        setDeleting(false);
+                    }
+                }
+            }
+        })
     };
 
     const handleAdicionarPet = () => {
-        // Lógica para vincular um pet novo ou existente
         navigate(`/tutores/${id}/pet/novo`);
     };
 
-    // --- Loading State ---
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-b from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4">
-                <Header userName="Admin" onSignOut={signOut} />
-                <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-                    <div className="flex justify-between">
-                        <Skeleton className="h-10 w-24" />
-                        <div className="flex gap-2"><Skeleton className="h-10 w-24" /><Skeleton className="h-10 w-24" /></div>
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-6">
-                        <Skeleton className="h-72 w-full md:w-72 rounded-xl" />
-                        <Skeleton className="h-72 flex-1 rounded-xl" />
-                    </div>
-                </main>
-            </div>
-        );
+        return (<Loading />);
     }
 
-    // --- Error State ---
     if (error || !tutor) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-amber-100 to-orange-200 p-4 flex flex-col items-center justify-center text-center">
+            <div className="min-h-screen min-w-screen from-amber-100 to-orange-200 p-4 flex flex-col items-center justify-center text-center">
                 <User className="w-16 h-16 text-stone-400 mb-4 opacity-50" />
                 <h2 className="text-2xl font-bold text-stone-800 mb-4">{error || "Tutor não encontrado"}</h2>
                 <Button onClick={() => navigate('/tutores')}>Voltar para Lista</Button>
@@ -117,12 +130,9 @@ export function TutorDetalhe() {
     }
 
     return (
-        <div className="min-h-screen min-w-screen bg-gradient-to-b from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
-            <Header userName="Admin" onSignOut={signOut} />
-
+        <div className="min-h-screen min-w-screen from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
             <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-                {/* --- Barra de Topo --- */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <Button
                         variant="ghost"
@@ -159,12 +169,10 @@ export function TutorDetalhe() {
                     </div>
                 </div>
 
-                {/* --- Área Hero do Tutor --- */}
                 <div className="relative">
                     <Card className="border-none shadow-2xl bg-white/80 dark:bg-stone-900/80 backdrop-blur-md overflow-visible mt-12 md:mt-0">
                         <div className="flex flex-col md:flex-row">
 
-                            {/* 1. FOTO DO TUTOR */}
                             <div className="relative w-full md:w-auto flex justify-center md:block p-6 md:p-0 md:-mt-8 md:-ml-8 mb-4 md:mb-0">
                                 <div className="w-64 h-64 md:w-72 md:h-72 rounded-2xl shadow-2xl overflow-hidden border-4 border-white dark:border-stone-700 bg-stone-200">
                                     {tutor.foto?.url ? (
@@ -181,7 +189,6 @@ export function TutorDetalhe() {
                                 </div>
                             </div>
 
-                            {/* 2. Informações do Tutor */}
                             <div className="flex-1 p-6 md:py-8 md:pr-8 flex flex-col gap-6">
                                 <div className="flex flex-wrap items-start justify-between gap-4">
                                     <div>
@@ -196,9 +203,7 @@ export function TutorDetalhe() {
                                     </div>
                                 </div>
 
-                                {/* Grid de Dados de Contato */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                                    {/* Email */}
                                     <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-stone-800/50 border border-amber-100 dark:border-stone-700">
                                         <div className="p-3 bg-white dark:bg-stone-700 rounded-full shadow-sm">
                                             <Mail className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -211,7 +216,6 @@ export function TutorDetalhe() {
                                         </div>
                                     </div>
 
-                                    {/* Telefone */}
                                     <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-stone-800/50 border border-amber-100 dark:border-stone-700">
                                         <div className="p-3 bg-white dark:bg-stone-700 rounded-full shadow-sm">
                                             <Phone className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -224,7 +228,6 @@ export function TutorDetalhe() {
                                         </div>
                                     </div>
 
-                                    {/* CPF */}
                                     <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-stone-800/50 border border-amber-100 dark:border-stone-700">
                                         <div className="p-3 bg-white dark:bg-stone-700 rounded-full shadow-sm">
                                             <CreditCard className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -237,7 +240,6 @@ export function TutorDetalhe() {
                                         </div>
                                     </div>
 
-                                    {/* Endereço */}
                                     <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-stone-800/50 border border-amber-100 dark:border-stone-700">
                                         <div className="p-3 bg-white dark:bg-stone-700 rounded-full shadow-sm">
                                             <MapPin className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -255,7 +257,6 @@ export function TutorDetalhe() {
                     </Card>
                 </div>
 
-                {/* --- Seção de Pets Vinculados --- */}
                 <div className="space-y-4 pt-4">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-3">
@@ -279,7 +280,7 @@ export function TutorDetalhe() {
                                 <Card
                                     key={pet.id}
                                     className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
-                                    onClick={() => navigate(`/pets/${pet.id}`)}
+                                    
                                 >
                                     <CardHeader className="flex flex-row items-center gap-4 pb-3">
                                         <Avatar className="h-14 w-14 border-2 border-white shadow-md">
@@ -308,6 +309,23 @@ export function TutorDetalhe() {
                                             <span>
                                                 {pet.idade} {pet.idade === 1 ? 'ano' : 'anos'}
                                             </span>
+                                        </div>
+                                        <div className="mt-1 h-0 group-hover:h-auto overflow-hidden transition-all duration-300 opacity-0 group-hover:opacity-100">
+                                            <Button size="sm" className="mb-2 w-full rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm border border-white/30 text-amber-900 dark:text-stone-200" onClick={() => navigate(`/pets/${pet.id}`)}>
+                                                <PawPrint className="w-4 h-4 mr-2" />
+                                                Ver Detalhes
+                                            </Button>
+                                            <Button
+                                                onClick={() => desvincular(pet.id)}
+                                                className="w-full flex-1 text-stone-700 dark:text-stone-200 sm:flex-none bg-red-500 hover:bg-red-600"
+                                            >
+                                                {deleting ? (
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="w-4 h-4 mr-2" />
+                                                )}
+                                                Desvincular
+                                            </Button>
                                         </div>
                                     </CardContent>
                                 </Card>

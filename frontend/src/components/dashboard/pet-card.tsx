@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from 'react-router-dom'; // Importação para navegação
+import { useNavigate } from 'react-router-dom';
 
 export interface Pet {
   id: number;

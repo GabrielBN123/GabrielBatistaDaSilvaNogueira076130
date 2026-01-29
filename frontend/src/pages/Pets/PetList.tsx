@@ -1,25 +1,21 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PetFacade, type Pet } from '@/facades/PetFacade';
-import { useAuth } from '@/context/AuthContext';
-import { Header } from '@/components/ui/header';
+import { PetFacade } from '@/facades/PetFacade';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CustomPagination } from '@/components/ui/custom-pagination';
 import { Search, Plus, PawPrint, Dog, Sparkles } from 'lucide-react';
+import type { Pet } from '@/interfaces/pet.interface';
 
 export function PetList() {
-    const { signOut } = useAuth();
     const navigate = useNavigate();
     
-    // Estados
     const [pets, setPets] = useState<Pet[]>([]);
     const [loading, setLoading] = useState(true);
     const [nome, setNome] = useState('');
     
-    // Paginação
     const [page, setPage] = useState(0);
     const [pageCount, setPageCount] = useState(0);
     const ITENS_POR_PAGINA = 10;
@@ -52,16 +48,13 @@ export function PetList() {
 
     const handleSearch = (val: string) => {
         setNome(val);
-        setPage(0); // Volta para a primeira página ao buscar
+        setPage(0);
     };
 
     return (
-        <div className="min-h-screen min-w-screen bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed bg-gradient-to-br from-amber-100 via-orange-50 to-amber-100 dark:from-stone-950 dark:via-neutral-900 dark:to-stone-950 p-4 font-sans">
-            <Header userName="Tutor" onSignOut={signOut} />
-
+        <div className="min-h-screen min-w-screen from-amber-100 via-orange-50 to-amber-100 dark:from-stone-950 dark:via-neutral-900 dark:to-stone-950 p-4 font-sans">
             <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
                 
-                {/* --- HEADER --- */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
                     <div className="text-center md:text-left">
                         <h1 className="text-4xl md:text-5xl font-black text-amber-600 dark:text-amber-500 tracking-tighter drop-shadow-sm flex items-center gap-3 justify-center md:justify-start">
@@ -69,7 +62,7 @@ export function PetList() {
                             Meus Pets
                         </h1>
                         <p className="text-stone-600 dark:text-stone-400 mt-2 text-lg">
-                            Colecione momentos com seus amigos peludos.
+                            Listagem de Pets.
                         </p>
                     </div>
 
@@ -94,7 +87,6 @@ export function PetList() {
                     </div>
                 </div>
 
-                {/* --- LISTA --- */}
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {Array.from({ length: 8 }).map((_, i) => (
@@ -130,7 +122,7 @@ export function PetList() {
                                         <div className="flex justify-between items-end mb-1">
                                             <h2 className="text-3xl font-black tracking-wide drop-shadow-md">{pet.nome}</h2>
                                             <Badge className="bg-amber-500 text-white border-none text-xs font-bold px-2 py-1 mb-1">
-                                                Lv. {pet.idade}
+                                                {pet.idade} - {parseInt(pet.idade) > 1 ? 'Ano' : 'Anos'}
                                             </Badge>
                                         </div>
                                         
@@ -138,7 +130,7 @@ export function PetList() {
                                             <p className="text-amber-200 font-medium flex items-center gap-2 text-sm mb-2">
                                                 <Sparkles className="w-3 h-3" /> {pet.raca}
                                             </p>
-                                            <Button size="sm" className="w-full rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm border border-white/30 text-white">
+                                            <Button size="sm" className="w-full rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm border border-white/30 text-amber-900 dark:text-stone-200">
                                                 Ver Detalhes
                                             </Button>
                                         </div>
@@ -151,7 +143,6 @@ export function PetList() {
                             </div>
                         ))}
 
-                        {/* Botão Adicionar (Apenas se houver espaço ou lista vazia) */}
                         {pets.length < ITENS_POR_PAGINA && (
                              <div 
                                 onClick={() => navigate('/pets/novo')}

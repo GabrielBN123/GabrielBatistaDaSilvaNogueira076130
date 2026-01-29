@@ -1,17 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TutorFacade, type Tutor } from '@/facades/TutorFacade';
-import { useAuth } from '@/context/AuthContext';
-import { Header } from '@/components/ui/header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, UserPlus, Mail, Phone, MapPin, Users, ArrowRight } from 'lucide-react';
+import { Search, UserPlus, Mail, Phone, MapPin, Users, ArrowRight, Plus } from 'lucide-react';
 import { CustomPagination } from '@/components/ui/custom-pagination';
 
 export function TutorList() {
-    const { signOut } = useAuth();
     const navigate = useNavigate();
 
     const [tutores, setTutores] = useState<Tutor[]>([]);
@@ -23,20 +20,15 @@ export function TutorList() {
 
     useEffect(() => {
         carregarDados();
-    }, [nome]);
+    }, [nome, page]);
 
     async function carregarDados() {
         setLoading(true);
         try {
-            const {data, total} = await TutorFacade.getAll(nome, 0, 50); // Pegando mais itens
+            const {data, total} = await TutorFacade.getAll(nome, page, ITENS_POR_PAGINA);
             const lista = data.content ? data.content : data;
             setTutores(lista);
             setPageCount(Math.ceil(total / ITENS_POR_PAGINA));
-
-            // const lista = data.content ? data.content : data;
-            // setTutores(lista);
-            // setPageCount(Math.ceil(total / ITENS_POR_PAGINA));
-            // setTotal(total);
             
         } catch (error) {
             console.error(error);
@@ -53,16 +45,9 @@ export function TutorList() {
     }, [pageCount]);
 
     return (
-        <div className="min-h-screen min-w-screen bg-stone-50 dark:bg-stone-950 p-4 font-sans relative overflow-hidden">
-            {/* Background Decorations */}
-            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-amber-200 to-transparent dark:from-amber-900/20 opacity-50 pointer-events-none" />
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-orange-300/30 rounded-full blur-3xl pointer-events-none" />
-
-            <Header userName="Admin" onSignOut={signOut} />
-
+        <div className="min-h-screen min-w-screen from-amber-100 via-orange-50 to-amber-100 dark:from-stone-950 dark:via-neutral-900 dark:to-stone-950 p-4 font-sans">
             <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 relative z-10">
                 
-                {/* --- HEADER --- */}
                 <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-10 pb-6 border-b border-amber-200 dark:border-stone-800">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
@@ -74,7 +59,7 @@ export function TutorList() {
                             </h1>
                         </div>
                         <p className="text-stone-500 dark:text-stone-400 max-w-md">
-                            Gerencie os contatos e visualize os perfis dos responsáveis.
+                            Listagem de Tutores.
                         </p>
                     </div>
 
@@ -99,7 +84,6 @@ export function TutorList() {
                     </div>
                 </div>
 
-                {/* --- GRID DE CARDS "ID BADGE" --- */}
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {Array.from({ length: 6 }).map((_, i) => (
@@ -114,11 +98,9 @@ export function TutorList() {
                                 onClick={() => navigate(`/tutores/${tutor.id}`)} // Ou rota de detalhe se tiver
                                 className="group relative bg-white dark:bg-stone-900 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-100 dark:border-stone-800 hover:border-amber-200 dark:hover:border-amber-900 cursor-pointer overflow-hidden"
                             >
-                                {/* Efeito Hover Barra Lateral */}
                                 <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-amber-400 to-orange-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                                 
                                 <div className="flex items-start gap-4">
-                                    {/* Avatar Grande */}
                                     <Avatar className="h-16 w-16 border-4 border-amber-50 dark:border-stone-800 shadow-sm group-hover:scale-105 transition-transform">
                                         {tutor.foto?.url ? (
                                             <AvatarImage src={tutor.foto.url} className="object-cover" />
@@ -138,7 +120,6 @@ export function TutorList() {
                                         </div>
                                         <p className="text-xs font-mono text-stone-400 mb-3">ID: #{tutor.id}</p>
                                         
-                                        {/* Info Compacta */}
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
                                                 <Mail className="w-3.5 h-3.5 text-amber-500/70" />
@@ -152,7 +133,6 @@ export function TutorList() {
                                     </div>
                                 </div>
 
-                                {/* Rodapé do Card (Endereço) */}
                                 {tutor.endereco && (
                                     <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800 flex items-start gap-2">
                                         <MapPin className="w-3.5 h-3.5 text-stone-400 mt-0.5 shrink-0" />
@@ -161,6 +141,18 @@ export function TutorList() {
                                 )}
                             </div>
                         ))}
+
+                        {tutores.length < ITENS_POR_PAGINA && (
+                             <div 
+                                onClick={() => navigate('/tutores/novo')}
+                                className="h-50 w-full rounded-[2rem] border-4 border-dashed border-amber-300 dark:border-stone-700 flex flex-col items-center justify-center cursor-pointer hover:bg-amber-50 dark:hover:bg-stone-900 transition-colors group"
+                            >
+                                <div className="bg-amber-100 dark:bg-stone-800 p-6 rounded-full group-hover:scale-110 transition-transform duration-300 mb-4">
+                                    <Plus className="w-10 h-10 text-amber-600 dark:text-amber-400" />
+                                </div>
+                                <span className="font-bold text-amber-700 dark:text-amber-500 text-lg">Adicionar Novo</span>
+                            </div>
+                        )}
                     </div>
                 )}
                 {!loading && pageCount > 1 && (

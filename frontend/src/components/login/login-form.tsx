@@ -35,13 +35,11 @@ export function LoginForm({
 	const { signIn } = useAuth();
 	const navigate = useNavigate();
 
-	// Eliminar aviso de erro ao digitar no e-mail
 	const handleUsernameChange = (val: string) => {
         setError("");
         setUsername(val);
     }
 
-	// Eliminar aviso de erro ao digitar na senha
     const handlePasswordChange = (val: string) => {
         setError("")
         setPassword(val)
@@ -74,7 +72,7 @@ export function LoginForm({
 		setTimeout(async () => {
 			try {
 				await signIn(username, password);
-				navigate('/'); // Redireciona para home após sucesso
+				navigate('/');
 			} catch (err) {
 				setError('Nome de usuário ou senha incorretos.');
 			}

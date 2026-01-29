@@ -2,38 +2,29 @@ import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PetFacade, type PetCreateDTO } from '@/facades/PetFacade';
 import { useAuth } from '@/context/AuthContext';
-import { Header } from '@/components/ui/header';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input'; // Seu componente Input
 import { Button } from '@/components/ui/button';
 import { Save, ArrowLeft, Loader2, Dog, Tag, Calendar, Camera, UploadCloud } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-
-// Interface para os dados do formulário
-interface PetFormData {
-    nome: string;
-    raca: string;
-    idade: number | string;
-}
+import { toast } from 'react-toastify';
+import type { PetFormData } from '@/interfaces/pet.interface';
 
 export function PetForm() {
     const { id } = useParams(); 
     const navigate = useNavigate();
-    const { signOut } = useAuth();
     
     const isEditing = !!id; 
 
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(isEditing);
     
-    // Estados do formulário
     const [formData, setFormData] = useState<PetFormData>({
         nome: '',
         raca: '',
         idade: ''
     });
 
-    // Estados para Imagem
     const [fotoPreview, setFotoPreview] = useState<string | null>(null); // Para mostrar na tela
     const [arquivoFoto, setArquivoFoto] = useState<File | null>(null);   // O arquivo real para envio
 
@@ -53,7 +44,6 @@ export function PetForm() {
                 idade: data.idade
             });
 
-            // Se o pet já tiver foto vinda do backend, setar o preview
             if (data.foto && data.foto.url) {
                 setFotoPreview(data.foto.url);
             }
@@ -71,12 +61,10 @@ export function PetForm() {
         setFormData(prev => ({ ...prev, [name]: val }));
     };
 
-    // Arquivo
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setArquivoFoto(file);
-            // Cria uma URL temporária para mostrar o preview imediatamente
             const previewURL = URL.createObjectURL(file);
             setFotoPreview(previewURL);
         }
@@ -107,12 +95,12 @@ export function PetForm() {
                 await PetFacade.uploadImage(PetID, arquivoFoto);
             }
             
-            alert(isEditing ? 'Pet atualizado com sucesso!' : 'Pet cadastrado com sucesso!');
-            navigate('/'); 
+            toast.success(isEditing ? 'Pet atualizado com sucesso!' : 'Pet cadastrado com sucesso!');
+            navigate(`/pets/${PetID}`); 
 
         } catch (error) {
             console.error("Erro ao salvar:", error);
-            alert('Ocorreu um erro. Verifique os dados e tente novamente.');
+            toast.error('Ocorreu um erro. Verifique os dados e tente novamente.');
         } finally {
             setLoading(false);
         }
@@ -128,9 +116,7 @@ export function PetForm() {
     }
 
     return (
-        <div className="min-h-screen min-w-screen bg-gradient-to-b from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
-            <Header userName="Tutor" onSignOut={signOut} />
-
+        <div className="min-h-screen min-w-screen from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
             <main className="max-w-2xl mx-auto px-4 py-8">
                 <Card>
                     <form onSubmit={handleSubmit}>
@@ -142,10 +128,8 @@ export function PetForm() {
 
                         <CardContent className="space-y-6">
                             
-                            {/* --- Área de Upload de Imagem --- */}
                             <div className="flex flex-col items-center justify-center gap-4 p-4 border-2 border-dashed border-amber-300 dark:border-stone-700 rounded-xl bg-amber-50/50 dark:bg-stone-900/50">
                                 <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md bg-stone-200 group cursor-pointer">
-                                    {/* Input File Escondido */}
                                     <input 
                                         type="file" 
                                         id="foto-upload" 
@@ -161,7 +145,6 @@ export function PetForm() {
                                             <Dog className="w-16 h-16 text-stone-400" />
                                         )}
                                         
-                                        {/* Overlay ao passar o mouse */}
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Camera className="w-8 h-8 text-white" />
                                         </div>
@@ -176,7 +159,6 @@ export function PetForm() {
                                 </label>
                             </div>
 
-                            {/* --- Inputs de Texto (Seu Componente) --- */}
                             <div className="space-y-4">
                                 <Input
                                     label="Nome do Pet"

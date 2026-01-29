@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -22,6 +25,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -50,9 +54,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
-  border-color: #646cff;
+  border-color: #bb4d00;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -63,10 +69,101 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
+  }
+}
+
+@layer base {
+  :root {
+    /* --- TEMA CLARO (LIGHT) --- */
+    --background: 40 20% 99%;
+    /* Fundo quase branco (Stone-50/Amber-50) */
+    --foreground: 20 14.3% 4.1%;
+    /* Texto escuro */
+
+    --card: 0 0% 100%;
+    /* Fundo dos Cards */
+    --card-foreground: 20 14.3% 4.1%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+
+    /* Cor Primária: Amber-500/600 (Laranja do seu logo) */
+    --primary: 36 100% 45%;
+    --primary-foreground: 60 9.1% 97.8%;
+
+    --secondary: 30 20% 96%;
+    --secondary-foreground: 24 9.8% 10%;
+
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+
+    --accent: 36 100% 90%;
+    /* Laranja bem claro para hovers */
+    --accent-foreground: 24 9.8% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+
+    --border: 30 15% 90%;
+    /* Bordas sutis */
+    --input: 30 15% 90%;
+    --ring: 36 100% 45%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* --- TEMA ESCURO (DARK) --- */
+    --background: 24 10% 8%;
+    /* Fundo Stone-950 */
+    --foreground: 60 9.1% 97.8%;
+    /* Texto claro */
+
+    --card: 24 10% 10%;
+    /* Fundo dos Cards um pouco mais claro */
+    --card-foreground: 60 9.1% 97.8%;
+
+    --popover: 20 14.3% 4.1%;
+    --popover-foreground: 60 9.1% 97.8%;
+
+    /* Cor Primária no Dark: Um Amber mais vibrante/amarelo */
+    --primary: 36 100% 50%;
+    --primary-foreground: 24 9.8% 10%;
+
+    --secondary: 12 6.5% 15.1%;
+    --secondary-foreground: 60 9.1% 97.8%;
+
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.4% 63.9%;
+
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 60 9.1% 97.8%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+
+    --border: 12 6.5% 15.1%;
+    --input: 12 6.5% 15.1%;
+    --ring: 36 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    /* Em vez de @apply border-border, usamos CSS direto com a variável */
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    /* Em vez de @apply bg-background text-foreground */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }

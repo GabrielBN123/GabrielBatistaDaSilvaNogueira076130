@@ -2,35 +2,37 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PetFacade } from '@/facades/PetFacade';
 import { useAuth } from '@/context/AuthContext';
-import { Header } from '@/components/ui/header';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  ArrowLeft, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  User, 
-  Dog, 
-  Calendar,
-  Edit3,      // Ícone Editar
-  Trash2,     // Ícone Excluir
-  UserPlus,   // Ícone Adicionar Tutor
-  PawPrint,
-  Loader2
+import {
+    ArrowLeft,
+    Mail,
+    Phone,
+    MapPin,
+    User,
+    Dog,
+    Calendar,
+    Edit3,
+    Trash2,
+    UserPlus,
+    PawPrint,
+    Loader2,
+    Users
 } from 'lucide-react';
-
-// Interfaces (Mantidas conforme seu padrão)
+import { Loading } from '@/components/ui/loading';
+import { TutorPetFacade } from '@/facades/TutorPetFacade';
+import { toast } from 'react-toastify';
+import { useConfirm } from '@/context/ModalContext';
 interface Foto {
     id: number;
     nome: string;
     contentType: string;
     url: string;
 }
-  
+
 interface Tutor {
     id: number;
     nome: string;
@@ -40,7 +42,7 @@ interface Tutor {
     cpf: string | null;
     foto: Foto | null;
 }
-  
+
 interface PetDetalheData {
     id: number;
     nome: string;
@@ -53,12 +55,12 @@ interface PetDetalheData {
 export function PetDetalhe() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { signOut } = useAuth();
 
     const [pet, setPet] = useState<PetDetalheData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [deleting, setDeleting] = useState(false); // Estado para loading de exclusão
+    const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     useEffect(() => {
         if (id) {
@@ -79,81 +81,88 @@ export function PetDetalhe() {
         }
     }
 
-    // --- Ações dos Botões ---
-
     const handleVoltar = () => navigate(-1);
-
     const handleEditar = () => {
         navigate(`/pets/editar/${id}`);
     };
 
     const handleExcluir = async () => {
-        // Confirmação simples (pode ser trocado por um Modal/Dialog depois)
-        const confirmou = window.confirm(`Tem certeza que deseja remover o pet ${pet?.nome}? Essa ação não pode ser desfeita.`);
-        
-        if (confirmou && id) {
-            setDeleting(true);
-            try {
-                // Supondo método delete no Facade
-                // await PetFacade.delete(Number(id)); 
-                
-                // Simulação de delay para ver o loading
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                alert('Pet removido com sucesso.');
-                navigate('/'); // Volta para Dashboard
-            } catch (error) {
-                console.error(error);
-                alert('Erro ao excluir o pet.');
-            } finally {
-                setDeleting(false);
+
+        confirm({
+            title: "Remover Tutor?",
+            description: `Tem certeza que deseja remover o pet ${pet?.nome}? Essa ação não pode ser desfeita.`,
+            variant: "destructive",
+            confirmText: "Sim, remover",
+
+            onConfirm: async () => {
+                if (id) {
+                    setDeleting(true);
+                    try {
+                        await PetFacade.delete(Number(id));
+                        toast.success('Pet Removido.');
+                    } catch (error) {
+                        console.error(error);
+                        toast.error('Erro ao excluir o pet.');
+                    } finally {
+                        setDeleting(false);
+                    }
+                }
             }
-        }
+        })
     };
 
     const handleCadastrarTutor = () => {
-        navigate(`/pets/${id}/tutor/novo`); 
+        navigate(`/pets/${id}/tutor/novo`);
     };
 
+    async function handleUnlink(tutorId: number) {
+
+        confirm({
+            title: "Desvincular Tutor?",
+            description: "Tem certeza? O tutor não será excluído, apenas o vínculo será removido.",
+            variant: "destructive",
+            confirmText: "Sim, remover",
+
+            onConfirm: async () => {
+                if (id && tutorId) {
+                    setDeleting(true);
+                    try {
+                        await TutorPetFacade.unlink(Number(tutorId), Number(id));
+                        toast.success('Pet desvinculado.');
+                    } catch (error) {
+                        console.error(error);
+                        toast.error('Erro ao desvincular o tutor.');
+                    } finally {
+                        setDeleting(false);
+                    }
+                }
+            }
+        })
+
+    }
+
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-b from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4">
-                 <Header userName="Tutor" onSignOut={signOut} />
-                 <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-                    <div className="flex justify-between">
-                        <Skeleton className="h-10 w-24" />
-                        <div className="flex gap-2"><Skeleton className="h-10 w-24" /><Skeleton className="h-10 w-24" /></div>
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-6">
-                        <Skeleton className="h-72 w-full md:w-72 rounded-xl" />
-                        <Skeleton className="h-72 flex-1 rounded-xl" />
-                    </div>
-                 </main>
-            </div>
-        );
+        return (<Loading />);
     }
 
     if (error || !pet) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-amber-100 to-orange-200 p-4 flex flex-col items-center justify-center text-center">
-                 <Dog className="w-16 h-16 text-stone-400 mb-4 opacity-50" />
-                 <h2 className="text-2xl font-bold text-stone-800 mb-4">{error || "Pet não encontrado"}</h2>
-                 <Button onClick={() => navigate('/')}>Voltar para o Início</Button>
+            <div className="min-h-screen min-w-screen from-amber-100 to-orange-200 p-4 flex flex-col items-center justify-center text-center">
+                <Dog className="w-16 h-16 text-stone-400 mb-4 opacity-50" />
+                <h2 className="text-2xl font-bold text-stone-800 mb-4">{error || "Pet não encontrado"}</h2>
+                <Button onClick={() => navigate('/pets')}>Voltar para o Início</Button>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen min-w-screen bg-gradient-to-b from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
-            <Header userName="Tutor" onSignOut={signOut} />
-
+        <div className="min-h-screen min-w-screen from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
             <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-                
-                {/* --- Barra de Topo: Navegação e Ações --- */}
+
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <Button 
-                        variant="ghost" 
-                        onClick={handleVoltar} 
+                    <Button
+                        variant="ghost"
+                        onClick={handleVoltar}
                         className="gap-2 hover:bg-white/20 text-stone-700 dark:text-stone-200 pl-0 sm:pl-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
@@ -161,20 +170,20 @@ export function PetDetalhe() {
                     </Button>
 
                     <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={handleEditar}
                             className="flex-1 sm:flex-none border-amber-300 hover:bg-amber-100 text-amber-900 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-800"
                         >
                             <Edit3 className="w-4 h-4 mr-2" />
                             Editar
                         </Button>
-                        
-                        <Button 
-                            variant="destructive" 
+
+                        <Button
+                            variant="destructive"
                             onClick={handleExcluir}
                             disabled={deleting}
-                            className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600"
+                            className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600 text-amber-900 dark:text-stone-200"
                         >
                             {deleting ? (
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -186,22 +195,16 @@ export function PetDetalhe() {
                     </div>
                 </div>
 
-                {/* --- Área Hero do Pet --- */}
                 <div className="relative">
-                    {/* Background Card com efeito Glass */}
                     <Card className="border-none shadow-2xl bg-white/80 dark:bg-stone-900/80 backdrop-blur-md overflow-visible mt-12 md:mt-0">
                         <div className="flex flex-col md:flex-row">
-                            
-                            {/* 1. IMAGEM PADRONIZADA (Float Style) */}
-                            {/* - Usa translate negativo no Desktop para dar efeito de destaque */}
-                            {/* - Tamanho fixo (w-72) para não quebrar layout */}
-                            {/* - Object-cover para cortar excessos sem deformar */}
+
                             <div className="relative w-full md:w-auto flex justify-center md:block p-6 md:p-0 md:-mt-8 md:-ml-8 mb-4 md:mb-0">
                                 <div className="w-64 h-64 md:w-72 md:h-72 rounded-2xl shadow-2xl overflow-hidden border-4 border-white dark:border-stone-700 bg-stone-200">
                                     {pet.foto?.url ? (
-                                        <img 
-                                            src={pet.foto.url} 
-                                            alt={pet.nome} 
+                                        <img
+                                            src={pet.foto.url}
+                                            alt={pet.nome}
                                             className="w-full h-full object-cover transition-transform hover:scale-110 duration-500"
                                         />
                                     ) : (
@@ -212,7 +215,6 @@ export function PetDetalhe() {
                                 </div>
                             </div>
 
-                            {/* 2. Informações do Pet */}
                             <div className="flex-1 p-6 md:py-8 md:pr-8 flex flex-col gap-6">
                                 <div className="flex flex-wrap items-start justify-between gap-4">
                                     <div>
@@ -220,8 +222,6 @@ export function PetDetalhe() {
                                             <h1 className="text-4xl md:text-5xl font-extrabold text-stone-800 dark:text-stone-100 tracking-tight">
                                                 {pet.nome}
                                             </h1>
-                                            {/* Status Badge (Exemplo: Ativo/Inativo se tivesse) */}
-                                            {/* <span className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/50"></span> */}
                                         </div>
                                         <Badge variant="outline" className="text-sm border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-transparent">
                                             Cod. #{pet.id}
@@ -229,7 +229,6 @@ export function PetDetalhe() {
                                     </div>
                                 </div>
 
-                                {/* Grid de Atributos */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                                     <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-stone-800/50 border border-amber-100 dark:border-stone-700">
                                         <div className="p-3 bg-white dark:bg-stone-700 rounded-full shadow-sm">
@@ -258,7 +257,6 @@ export function PetDetalhe() {
                     </Card>
                 </div>
 
-                {/* --- Seção de Tutores --- */}
                 <div className="space-y-4 pt-4">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-3">
@@ -269,24 +267,24 @@ export function PetDetalhe() {
                                 Tutores Responsáveis
                             </h2>
                         </div>
-                        
+
                         <Button onClick={handleCadastrarTutor} className="gap-2 bg-primary hover:bg-primary/90 shadow-md shadow-amber-900/20">
                             <UserPlus className="w-4 h-4" />
                             Cadastrar Tutor
                         </Button>
                     </div>
-                    
+
                     {pet.tutores && pet.tutores.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {pet.tutores.map((tutor) => (
-                                <Card key={tutor.id} className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer" onClick={() => navigate(`/tutores/${tutor.id}`)} >
+                                <Card key={tutor.id} className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
                                     <CardHeader className="flex flex-row items-center gap-4 pb-3">
                                         <Avatar className="h-14 w-14 border-2 border-white shadow-md">
                                             {tutor.foto?.url ? (
                                                 <AvatarImage src={tutor.foto.url} alt={tutor.nome} className="object-cover" />
                                             ) : (
                                                 <AvatarFallback className="bg-gradient-to-br from-amber-200 to-orange-300 text-amber-900 font-bold">
-                                                    {tutor.nome.substring(0,2).toUpperCase()}
+                                                    {tutor.nome.substring(0, 2).toUpperCase()}
                                                 </AvatarFallback>
                                             )}
                                         </Avatar>
@@ -294,9 +292,6 @@ export function PetDetalhe() {
                                             <CardTitle className="text-lg font-bold truncate text-stone-800 dark:text-stone-100" title={tutor.nome}>
                                                 {tutor.nome}
                                             </CardTitle>
-                                            <Badge variant="secondary" className="mt-1 text-xs">
-                                                Principal
-                                            </Badge>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-3 pt-2 text-sm bg-stone-50/50 dark:bg-stone-900/30">
@@ -314,6 +309,25 @@ export function PetDetalhe() {
                                                 <span className="line-clamp-2" title={tutor.endereco}>{tutor.endereco}</span>
                                             </div>
                                         )}
+                                        <div className="mt-1 h-0 group-hover:h-auto overflow-hidden transition-all duration-300 opacity-0 group-hover:opacity-100">
+                                            <Button size="sm" className="mb-2 w-full rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm border border-white/30 text-amber-900 dark:text-stone-200" onClick={() => navigate(`/tutores/${tutor.id}`)} >
+                                                <Users className="w-4 h-4 mr-2" />
+                                                Ver Detalhes
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={() => handleUnlink(tutor.id)}
+                                                disabled={deleting}
+                                                className="w-full flex-1 text-stone-700 dark:text-stone-200 sm:flex-none bg-red-500 hover:bg-red-600"
+                                            >
+                                                {deleting ? (
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="w-4 h-4 mr-2" />
+                                                )}
+                                                Desvincular
+                                            </Button>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             ))}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { AuthFacade, type User } from '@/facades/AuthFacade';
+import { AuthFacade } from '@/facades/AuthFacade';
+import type { User } from '@/interfaces/auth.interface';
 
 interface AuthContextType {
     user: User | null;
@@ -13,10 +14,8 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 const { Provider } = AuthContext;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    // 1. Começamos com null. A verdade virá do useEffect.
     const [user, setUser] = useState<User | null>(null);
 
-    // 2. Loading começa true para "segurar" a renderização das rotas privadas
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -25,7 +24,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         async function initializeAuth() {
 
             try {
-                // Verifica se o método existe e é acessível
                 const storedUser = AuthFacade.getUserFromStorage();
 
                 if (!storedUser) {
@@ -38,7 +36,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (isValid) {
                     if (mounted) setUser(storedUser);
                 } else {
-                    // SE TRAVAR AQUI, O PROBLEMA É NA SUA API OU NO AXIOS
                     const newToken = await AuthFacade.refreshSession();
 
                     if (newToken && mounted) {
@@ -58,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         initializeAuth();
 
-        // Mantemos a inscrição para atualizações em tempo real (ex: login/logout manual)
         const subscription = AuthFacade.user$.subscribe((newUser) => {
             if (mounted) setUser(newUser);
         });
@@ -75,12 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     function signOut() {
         AuthFacade.logout();
-        setUser(null); // Garante a atualização visual imediata
+        setUser(null);
     }
 
-    // Enquanto estiver verificando o token, mostramos um loading.
-    // Isso IMPEDE que a PrivateRoute redirecione para login indevidamente
-    // ou que mostre o Dashboard com token inválido.
     if (loading) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-stone-950 z-50">
