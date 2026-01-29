@@ -1,52 +1,15 @@
+import type { Pet, PetPaginatedResponse } from '@/interfaces/pet.interface';
 import { api } from '@/services/api';
-
-interface Foto {
-  id: number;
-  nome: string;
-  contentType: string;
-  url: string;
-}
-
-interface Tutor {
-  id: number;
-  nome: string;
-  email: string;
-  telefone: string;
-  endereco: string;
-  cpf: string | null;
-  foto: Foto | null;
-}
-
-export interface PetPaginatedResponse {
-  page: number;
-  size: number;
-  total: number;
-  pageCount: number;
-  content: Pet[];
-}
-
-export interface Pet {
-  id: number;
-  nome: string;
-  raca: string;
-  idade: number;
-  foto?: {
-    id: number;
-    nome: string;
-    url: string;
-  } | null;
-}
 
 export type PetCreateDTO = Omit<Pet, 'id' | 'foto'>;
 
 export class PetFacade {
 
-  static async getAll(nome = '', page = 0, raca = '', limit = 10): Promise<{ data: PetPaginatedResponse[]; total: number }> {
+  static async getAll(nome = '', page = 0, raca = '', size = 10): Promise<{ data: PetPaginatedResponse[]; total: number }> {
 
-    // Cria o objeto de parâmetros
     const params: any = {
       page,
-      limit
+      size
     };
 
     if (nome) {
@@ -88,6 +51,7 @@ export class PetFacade {
       headers: {
         'Content-type': 'multpart/form-data',
       },
+      timeout: 30000,
       transformRequest: (data, headers) => {
         return data;
       }
@@ -98,7 +62,6 @@ export class PetFacade {
     await api.delete(`/v1/pets/${id}`);
   }
 
-  // Busca pets de um tutor específico (útil para detalhes)
   static async getByTutorId(tutorId: number): Promise<Pet[]> {
     const response = await api.get<Pet[]>(`/v1/pets?tutorId=${tutorId}`);
     return response.data;
