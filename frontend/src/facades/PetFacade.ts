@@ -1,31 +1,64 @@
+import { BehaviorSubject } from 'rxjs';
 import type { Pet, PetPaginatedResponse } from '@/interfaces/pet.interface';
 import { api } from '@/services/api';
 
 export type PetCreateDTO = Omit<Pet, 'id' | 'foto'>;
 
+export interface PetState {
+  pets: PetPaginatedResponse[];
+  loading: boolean;
+  error: string | null;
+  total: number | string;
+}
+
 export class PetFacade {
 
+  private static initialState: PetState = {
+    pets: [],
+    loading: false,
+    error: null,
+    total: 0
+  };
+
+  private static petSubject = new BehaviorSubject<PetState>(PetFacade.initialState);
+  public static pets$ = PetFacade.petSubject.asObservable();
+
+  private static updateState(newState: Partial<PetState>) {
+    this.petSubject.next({ ...this.petSubject.value, ...newState });
+  }
+
   static async getAll(nome = '', page = 0, raca = '', size = 10): Promise<{ data: PetPaginatedResponse[]; total: number }> {
+    this.updateState({ loading: true, error: null });
 
     const params: any = {
       page,
       size
     };
 
-    if (nome) {
-      params.nome = nome;
+    try {
+      const params: any = { page, size };
+      if (nome) params.nome = nome;
+      if (raca) params.raca = raca;
+
+      const response = await api.get('/v1/pets', { params });
+      
+      const result = {
+        data: response.data,
+        total: response.data.total || 0
+      };
+
+      this.updateState({ 
+        pets: result.data, 
+        total: result.total, 
+        loading: false 
+      });
+
+      return result;
+    } catch (error) {
+      this.updateState({ error: 'Erro ao carregar pets', loading: false });
+      throw error;
     }
-
-    if (raca) {
-      params.raca = raca;
-    }
-
-    const response = await api.get('/v1/pets', { params });
-
-    return {
-      data: response.data,
-      total: response.data.total || 'Não foram encontrados'
-    };
+    
   }
 
   static async getById(id: number | string): Promise<Pet> {

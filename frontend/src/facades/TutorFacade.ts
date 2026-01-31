@@ -1,27 +1,48 @@
 import type { TutorPaginatedResponse, Tutor } from '@/interfaces/tutor.interface';
 import { api } from '../services/api';
+import { BehaviorSubject } from 'rxjs';
+
+export interface TutorState {
+  tutores: TutorPaginatedResponse[];
+  loading: boolean;
+  error: string | null;
+  total: number | string;
+}
 
 export class TutorFacade {
 
+  private static initialState: TutorState = {
+    tutores: [],
+    loading: false,
+    error: null,
+    total: 0
+  };
+
+  private static tutorSubject = new BehaviorSubject<TutorState>(TutorFacade.initialState);
+  public static tutores$ = TutorFacade.tutorSubject.asObservable();
+
+  private static updateState(newState: Partial<TutorState>) {
+    this.tutorSubject.next({ ...this.tutorSubject.value, ...newState });
+  }
+
   static async getAll(nome = '', page = 0, size = 10): Promise<{ data: TutorPaginatedResponse[]; total: number }> {
+    this.updateState({ loading: true, error: null });
 
-    const params: any = {
-      page,
-      size
-    };
+    try {
+      const params = { page, size, ...(nome && { nome }) };
+      const response = await api.get('/v1/tutores', { params });
+      
+      const result = {
+        data: response.data,
+        total: response.data.total || 0
+      };
 
-    if (nome) {
-      params.nome = nome;
+      this.updateState({ tutores: result.data, total: result.total, loading: false });
+      return result;
+    } catch (error) {
+      this.updateState({ error: 'Erro ao carregar tutores', loading: false });
+      throw error;
     }
-
-    const response = await api.get('/v1/tutores', { params });
-    console.log('LOG: ', response);
-
-
-    return {
-      data: response.data,
-      total: response.data.total || 'Não foram encontrados'
-    };
   }
 
   static async getById(id: number | string): Promise<Tutor> {
@@ -31,6 +52,7 @@ export class TutorFacade {
 
   static async create(data: Omit<Tutor, 'id'>): Promise<Tutor> {
     const response = await api.post<Tutor>('/v1/tutores', data);
+    await this.getAll();
     return response.data;
   }
 
@@ -53,5 +75,6 @@ export class TutorFacade {
 
   static async delete(id: number): Promise<void> {
     await api.delete(`/v1/tutores/${id}`);
+    await this.getAll();
   }
 }
