@@ -36,7 +36,7 @@ export class TutorFacade {
 
   static async uploadImage(id: number, file: File): Promise<void> {
     const formData = new FormData();
-    formData.append('foto', file); // Ou 'file', verifique o Swagger
+    formData.append('foto', file);
 
     await api.post(`/v1/tutores/${id}/fotos`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

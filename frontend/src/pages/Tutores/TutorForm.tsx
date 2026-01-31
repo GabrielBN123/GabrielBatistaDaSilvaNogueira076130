@@ -20,6 +20,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'react-toastify';
 import type { TutorFormData } from '@/interfaces/tutor.interface';
+import { validarCPF } from '@/utils/validateCPF';
 
 
 export function TutorForm() {
@@ -92,6 +93,12 @@ export function TutorForm() {
 	async function handleSubmit(e: FormEvent) {
 		e.preventDefault();
 		setLoading(true);
+
+		if (!validarCPF(formData.cpf.toString().replace(/\D/g, ''))) {
+			toast.error('insira um CPF válido.');
+			setLoading(false);
+			return;
+		}
 
 		try {
 			const payload = {
