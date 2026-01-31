@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PetFacade } from '@/facades/PetFacade';
 import { TutorFacade } from '@/facades/TutorFacade';
-import { 
-    PawPrint, 
-    Users, 
-    ArrowRight, 
-    Activity 
+import {
+    PawPrint,
+    Users,
+    ArrowRight,
+    Activity,
+    WifiOff
 } from 'lucide-react';
+import { HealthCheckService } from '@/core/HealthCheck';
 
 export function Dashboard() {
     const navigate = useNavigate();
@@ -67,7 +69,7 @@ export function Dashboard() {
     return (
         <div className="min-h-screen min-w-screen from-amber-50 via-orange-50 to-amber-100 dark:from-stone-950 dark:via-neutral-900 dark:to-stone-950 p-4 font-sans relative overflow-hidden">
             <main className="max-w-5xl mx-auto py-12 px-4 sm:px-6 relative z-10">
-                
+
                 <div className="mb-12 text-center md:text-left animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <h1 className="text-4xl md:text-5xl font-black text-stone-800 dark:text-stone-100 tracking-tight mb-2">
                         Painel de Controle
@@ -79,7 +81,7 @@ export function Dashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {cards.map((card, index) => (
-                        <div 
+                        <div
                             key={card.title}
                             onClick={() => navigate(card.route)}
                             className={`
@@ -130,13 +132,21 @@ export function Dashboard() {
                     ))}
                 </div>
 
-                <div className="mt-16 flex justify-center opacity-60">
-                    <div className="flex items-center gap-2 text-sm text-stone-400 bg-stone-100/50 dark:bg-stone-900/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <Activity className="w-4 h-4 animate-pulse text-green-500" />
-                        Sistema Operacional e Conectado
+                {HealthCheckService.checkReadiness() ? (
+                    <div className="mt-16 flex justify-center opacity-60">
+                        <div className="flex items-center gap-2 text-sm text-stone-400 bg-stone-100/50 dark:bg-stone-900/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                            <Activity className="w-4 h-4 animate-pulse text-green-500" />
+                            Sistema Operacional e Conectado
+                        </div>
                     </div>
-                </div>
-
+                ) : (
+                    <div className="mt-16 flex justify-center opacity-60">
+                        <div className="flex items-center gap-2 text-sm text-stone-400 bg-stone-100/50 dark:bg-stone-900/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                            <WifiOff className="w-4 h-4 animate-pulse text-red-500" />
+                            A conexão não pode ser estabelecida
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
