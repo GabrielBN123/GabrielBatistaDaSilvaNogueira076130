@@ -1,8 +1,7 @@
 import { PetFacade } from './PetFacade';
-import { api } from '../services/api'; // <--- Use caminho relativo aqui
+import { api } from '../services/api';
 import { firstValueFrom } from 'rxjs';
 
-// Forçamos o mock no caminho que o Facade usa internamente
 jest.mock('../services/api', () => ({
   api: {
     get: jest.fn(),
@@ -16,7 +15,6 @@ describe('PetFacade', () => {
   
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset manual do estado para garantir limpeza entre testes
     // @ts-ignore
     PetFacade.petSubject.next(PetFacade.initialState);
   });
@@ -24,7 +22,6 @@ describe('PetFacade', () => {
   it('deve atualizar o estado ao chamar getAll', async () => {
     const mockPets = [{ id: 1, nome: 'Rex' }];
     
-    // Simula exatamente a estrutura que o Axios entrega
     mockedApi.get.mockResolvedValue({ 
       data: mockPets 
     });
@@ -33,8 +30,6 @@ describe('PetFacade', () => {
 
     const state = await firstValueFrom(PetFacade.pets$);
     
-    // Se continuar falhando aqui, adicione um console.log(PetFacade) 
-    // antes do await para ver se os métodos existem.
     expect(state.pets).toEqual(mockPets);
     expect(state.loading).toBe(false);
   });

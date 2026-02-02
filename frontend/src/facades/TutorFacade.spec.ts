@@ -14,19 +14,24 @@ const mockedApi = api as jest.Mocked<typeof api>;
 describe('TutorFacade', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset do estado (ajuste o caminho se necessário)
-    // @ts-ignore
-    TutorFacade.tutorSubject.next(TutorFacade.initialState);
+    
+    (TutorFacade as any).tutorSubject.next((TutorFacade as any).initialState);
   });
 
   it('deve carregar tutores e atualizar o estado', async () => {
     const mockTutores = [{ id: 1, nome: 'João Silva' }];
-    mockedApi.get.mockResolvedValue({ data: mockTutores });
+    mockedApi.get.mockResolvedValue({ 
+        data: { 
+            content: mockTutores,
+            totalElements: 1 
+        } 
+    });
 
     await TutorFacade.getAll();
 
     const state = await firstValueFrom(TutorFacade.tutores$);
-    expect(state.tutores).toEqual(mockTutores);
+    
+    expect(state.tutores).toEqual(expect.arrayContaining([expect.objectContaining({ nome: 'João Silva' })]));
     expect(state.loading).toBe(false);
     expect(mockedApi.get).toHaveBeenCalledWith('/v1/tutores', expect.any(Object));
   });

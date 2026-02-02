@@ -1,18 +1,19 @@
-import { AuthFacade } from './AuthFacade'; 
-import { api } from '../services/api'; // Ajuste o número de ../ se necessário
-import { firstValueFrom } from 'rxjs';
+import { AuthFacade } from './AuthFacade';
+import { api } from '../services/api';
 
-// Mock simplificado da API
 jest.mock('../services/api', () => ({
   api: {
     post: jest.fn(),
     get: jest.fn(),
     put: jest.fn(),
-    delete: jest.fn()
+    delete: jest.fn(),
+    interceptors: {
+      request: { use: jest.fn() },
+      response: { use: jest.fn() }
+    }
   }
 }));
 
-// Mock do jwt-decode
 jest.mock('jwt-decode', () => ({
   jwtDecode: jest.fn(() => ({
     userId: 1,
@@ -22,16 +23,42 @@ jest.mock('jwt-decode', () => ({
   }))
 }));
 
-// Importante para o mockedApi funcionar
 const mockedApi = api as jest.Mocked<typeof api>;
 
 describe('AuthFacade', () => {
-  // Verifique se os 'it' estão aqui dentro
-  it('teste de sanidade', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('teste de sanidade (deve passar sempre)', () => {
     expect(true).toBe(true);
   });
 
-  it('deve realizar login...', async () => {
-     // ... seu código de login
+  it('deve realizar login com sucesso', async () => {
+    mockedApi.post.mockResolvedValue({
+      data: {
+        accessToken: 'token-falso-123',
+        refreshToken: 'refresh-falso-456',
+        user: { nome: 'Gabriel' }
+      }
+    });
+
+    const response = await AuthFacade.login('admin', 'admin');
+
+    expect(mockedApi.post).toHaveBeenCalledWith('/autenticacao/login', {
+      email: 'admin',
+      password: 'admin'
+    });
+
+    // Verifica se retornou
+    expect(response).toHaveProperty('accessToken');
+  });
+
+  it('deve tratar erro no login', async () => {
+    mockedApi.post.mockRejectedValue(new Error('Credenciais inválidas'));
+
+    await expect(AuthFacade.login('errado@email.com', '0000'))
+      .rejects
+      .toThrow();
   });
 });
