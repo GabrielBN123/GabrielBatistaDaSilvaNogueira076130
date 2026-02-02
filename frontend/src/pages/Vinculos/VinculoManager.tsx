@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { TutorFacade } from '@/facades/TutorFacade';
 import { PetFacade } from '@/facades/PetFacade';
 import { TutorPetFacade } from '@/facades/TutorPetFacade';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -76,7 +76,6 @@ export function VinculoManager() {
                 });
             } else {
                 const data = await PetFacade.getById(entityId);
-
                 setSourceEntity({
                     id: data.id,
                     nome: data.nome,
@@ -122,7 +121,6 @@ export function VinculoManager() {
                 const { data, total } = await TutorFacade.getAll(nome, page, ITENS_POR_PAGINA);
                 const lista = data.content || data;
                 setPageCount(Math.ceil(total / ITENS_POR_PAGINA));
-                console.log(sourceEntity);
 
                 results = lista.map((t: any) => ({
                     id: t.id,
@@ -194,7 +192,7 @@ export function VinculoManager() {
                         {loadingSource ? (
                             <Skeleton className="h-64 w-full rounded-2xl" />
                         ) : sourceEntity ? (
-                            <Card className="border-2 border-primary/20 shadow-lg bg-white/80 dark:bg-stone-900/80 backdrop-blur">
+                            <Card className="border-2 border-primary/20 shadow-lg bg-white/80 dark:bg-stone-900/80 backdrop-blur dark:bg-stone-900/75">
                                 <CardContent className="flex flex-col items-center p-8 text-center space-y-4">
                                     <Avatar className="h-32 w-32 border-4 border-white shadow-xl">
                                         {sourceEntity.fotoUrl ? (
@@ -235,10 +233,11 @@ export function VinculoManager() {
 
                         <div className="relative z-20">
                             <Input
+                                type='text'
                                 placeholder={`Digite o nome do ${targetLabel}...`}
                                 value={nome}
                                 onChange={(val) => setNome(val)}
-                                className="h-12 pl-11 bg-white dark:bg-stone-900 shadow-sm border-stone-200"
+                                className=""
                                 icon={Search}
                             />
                         </div>
@@ -273,7 +272,7 @@ export function VinculoManager() {
                             {targetList.map((target) => (
                                 <Card
                                     key={target.id}
-                                    className="group overflow-hidden hover:border-primary transition-colors cursor-pointer"
+                                    className="group overflow-hidden hover:border-primary transition-colors cursor-pointer dark:bg-stone-900/75"
                                 >
                                     <div className="flex items-center p-3 gap-3">
                                         <Avatar className="h-12 w-12 border border-stone-200">

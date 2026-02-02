@@ -27,13 +27,8 @@ export class PetFacade {
     this.petSubject.next({ ...this.petSubject.value, ...newState });
   }
 
-  static async getAll(nome = '', page = 0, raca = '', size = 10): Promise<{ data: PetPaginatedResponse[]; total: number }> {
+  static async getAll(nome = '', page = 0, raca = '', size = 10): Promise<{ data: PetPaginatedResponse; total: number }> {
     this.updateState({ loading: true, error: null });
-
-    const params: any = {
-      page,
-      size
-    };
 
     try {
       const params: any = { page, size };
@@ -41,16 +36,16 @@ export class PetFacade {
       if (raca) params.raca = raca;
 
       const response = await api.get('/v1/pets', { params });
-      
+
       const result = {
         data: response.data,
         total: response.data.total || 0
       };
 
-      this.updateState({ 
-        pets: result.data, 
-        total: result.total, 
-        loading: false 
+      this.updateState({
+        pets: result.data,
+        total: result.total,
+        loading: false
       });
 
       return result;
@@ -58,7 +53,6 @@ export class PetFacade {
       this.updateState({ error: 'Erro ao carregar pets', loading: false });
       throw error;
     }
-    
   }
 
   static async getById(id: number | string): Promise<Pet> {
@@ -85,7 +79,7 @@ export class PetFacade {
         'Content-type': 'multpart/form-data',
       },
       timeout: 30000,
-      transformRequest: (data, headers) => {
+      transformRequest: (data) => {
         return data;
       }
     });

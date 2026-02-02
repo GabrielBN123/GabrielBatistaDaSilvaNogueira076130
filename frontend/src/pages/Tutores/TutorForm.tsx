@@ -1,7 +1,6 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TutorFacade } from '@/facades/TutorFacade';
-import { useAuth } from '@/context/AuthContext';
+import { TutorFacade, type TutorCreateDTO } from '@/facades/TutorFacade';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -26,7 +25,6 @@ import { validarCPF } from '@/utils/validateCPF';
 export function TutorForm() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { signOut } = useAuth();
 
 	const isEditing = !!id;
 
@@ -101,7 +99,7 @@ export function TutorForm() {
 		}
 
 		try {
-			const payload = {
+			const payload: TutorCreateDTO = {
 				nome: formData.nome,
 				email: formData.email,
 				telefone: formData.telefone,

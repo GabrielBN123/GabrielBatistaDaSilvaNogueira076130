@@ -45,8 +45,6 @@ export function TutorDetalhe() {
         setLoading(true);
         try {
             const data = await TutorFacade.getById(Number(tutorId));
-            console.log('DETALHES', data);
-
             setTutor(data);
         } catch (err) {
             console.error('ERRO');
@@ -98,8 +96,9 @@ export function TutorDetalhe() {
                 if (id && petId) {
                     setDeleting(true);
                     try {
-                        await TutorPetFacade.unlink(Number(tutor.id), Number(petId));
+                        await TutorPetFacade.unlink(Number(id), Number(petId));
                         toast.success('Pet desvinculado.');
+                        await carregarDetalhes(id);
                     } catch (error) {
                         console.error(error);
                         toast.error('Erro ao desvincular o pet.');
@@ -279,7 +278,7 @@ export function TutorDetalhe() {
                             {tutor.pets.map((pet) => (
                                 <Card
                                     key={pet.id}
-                                    className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+                                    className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer dark:bg-stone-900/75"
                                     
                                 >
                                     <CardHeader className="flex flex-row items-center gap-4 pb-3">

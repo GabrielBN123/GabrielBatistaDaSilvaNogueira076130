@@ -15,17 +15,21 @@ import { HealthCheckService } from '@/core/HealthCheck';
 export function Dashboard() {
     const navigate = useNavigate();
 
-    // Estado para contadores
     const [stats, setStats] = useState({ pets: 0, tutores: 0 });
     const [loading, setLoading] = useState(true);
+    const [isServiceUp, setIsServiceUp] = useState(false);
 
     useEffect(() => {
+        const checkHealth = async () => {
+            const status = await HealthCheckService.checkReadiness();
+            setIsServiceUp(status);
+        };
+
         async function fetchStats() {
             try {
-                // Buscamos apenas 1 item para pegar o 'total' do paginado de forma leve
                 const [petsData, tutoresData] = await Promise.all([
                     PetFacade.getAll('', 0, '', 1),
-                    TutorFacade.getAll(0, 1)
+                    TutorFacade.getAll('', 0, 1)
                 ]);
 
                 setStats({
@@ -39,6 +43,8 @@ export function Dashboard() {
             }
         }
         fetchStats();
+
+        checkHealth();
     }, []);
 
     const cards = [
@@ -51,7 +57,7 @@ export function Dashboard() {
             bgIcon: "bg-amber-100 dark:bg-amber-900/30",
             borderHover: "hover:border-amber-300 dark:hover:border-amber-700",
             route: "/pets",
-            description: "Gerencie fichas médicas, fotos e dados dos pets."
+            description: "Gerencie os pets mais queridos da região."
         },
         {
             title: "Tutores",
@@ -62,7 +68,7 @@ export function Dashboard() {
             bgIcon: "bg-blue-100 dark:bg-blue-900/30",
             borderHover: "hover:border-blue-300 dark:hover:border-blue-700",
             route: "/tutores",
-            description: "Administre contatos e vínculos dos proprietários."
+            description: "Administre os tutores que estão disponívies."
         }
     ];
 
@@ -80,7 +86,7 @@ export function Dashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {cards.map((card, index) => (
+                    {cards.map((card) => (
                         <div
                             key={card.title}
                             onClick={() => navigate(card.route)}
@@ -132,7 +138,7 @@ export function Dashboard() {
                     ))}
                 </div>
 
-                {HealthCheckService.checkReadiness() ? (
+                {isServiceUp ? (
                     <div className="mt-16 flex justify-center opacity-60">
                         <div className="flex items-center gap-2 text-sm text-stone-400 bg-stone-100/50 dark:bg-stone-900/50 px-4 py-2 rounded-full backdrop-blur-sm">
                             <Activity className="w-4 h-4 animate-pulse text-green-500" />

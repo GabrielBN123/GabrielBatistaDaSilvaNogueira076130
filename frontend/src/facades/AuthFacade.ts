@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { jwtDecode } from "jwt-decode"; // Importação nova
+import { jwtDecode } from "jwt-decode";
 import { api } from "../services/api";
 import axios from 'axios';
 import type { JwtPayload, LoginResponse, User } from '@/interfaces/auth.interface';
@@ -97,6 +97,23 @@ export class AuthFacade {
       return decoded.exp > (currentTime + 10);
     } catch (error) {
       return false;
+    }
+  }
+
+  static getSecondsToExpiry(): number {
+    const token = this.getAccessToken();
+    if (!token) return 0;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      if (!decoded.exp) return 0;
+
+      const currentTime = Math.floor(Date.now() / 1000);
+      const timeRemaining = decoded.exp - currentTime;
+
+      return timeRemaining > 0 ? timeRemaining : 0;
+    } catch (error) {
+      return 0;
     }
   }
 

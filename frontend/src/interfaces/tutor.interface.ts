@@ -12,8 +12,8 @@ export interface Tutor {
   telefone: string;
   endereco: string;
   cpf: string | null;
-  foto: Foto | null;
-  pets: Pet[] | null
+  foto?: Foto | null;
+  pets?: Pet[] | null
 }
 export interface TutorPaginatedResponse {
   page: number;

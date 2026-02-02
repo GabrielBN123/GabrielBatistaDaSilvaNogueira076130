@@ -28,15 +28,12 @@ export interface Pet {
   nome: string;
   raca: string;
   idade: number;
-  foto?: {
-    id: number;
-    nome: string;
-    url: string;
-  } | null;
+  foto?: Foto | null;
+  tutores?: Tutor[] | null;
 }
 
 export interface PetFormData {
-    nome: string;
-    raca: string;
-    idade: number | string;
+  nome: string;
+  raca: string;
+  idade: number | string;
 }

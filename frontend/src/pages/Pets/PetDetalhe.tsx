@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PetFacade } from '@/facades/PetFacade';
-import { useAuth } from '@/context/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     ArrowLeft,
@@ -26,37 +24,13 @@ import { Loading } from '@/components/ui/loading';
 import { TutorPetFacade } from '@/facades/TutorPetFacade';
 import { toast } from 'react-toastify';
 import { useConfirm } from '@/context/ModalContext';
-interface Foto {
-    id: number;
-    nome: string;
-    contentType: string;
-    url: string;
-}
-
-interface Tutor {
-    id: number;
-    nome: string;
-    email: string;
-    telefone: string;
-    endereco: string;
-    cpf: string | null;
-    foto: Foto | null;
-}
-
-interface PetDetalheData {
-    id: number;
-    nome: string;
-    raca: string;
-    idade: number;
-    foto: Foto | null;
-    tutores: Tutor[];
-}
+import type { Pet } from '@/interfaces/pet.interface';
 
 export function PetDetalhe() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [pet, setPet] = useState<PetDetalheData | null>(null);
+    const [pet, setPet] = useState<Pet | null>(null);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -129,6 +103,7 @@ export function PetDetalhe() {
                     try {
                         await TutorPetFacade.unlink(Number(tutorId), Number(id));
                         toast.success('Pet desvinculado.');
+                        await carregarDetalhes(id);
                     } catch (error) {
                         console.error(error);
                         toast.error('Erro ao desvincular o tutor.');
@@ -277,7 +252,7 @@ export function PetDetalhe() {
                     {pet.tutores && pet.tutores.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {pet.tutores.map((tutor) => (
-                                <Card key={tutor.id} className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                                <Card key={tutor.id} className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer dark:bg-stone-900/75">
                                     <CardHeader className="flex flex-row items-center gap-4 pb-3">
                                         <Avatar className="h-14 w-14 border-2 border-white shadow-md">
                                             {tutor.foto?.url ? (

@@ -12,15 +12,12 @@ import {
   Sun,
   Moon
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface HeaderProps {
-  userName?: string;
-  userAvatar?: string;
   onSignOut?: () => void;
 }
 
-export function Header({ userName = "Usuário", userAvatar, onSignOut }: HeaderProps) {
+export function Header({ onSignOut }: HeaderProps) {
   const location = useLocation();
 
   const [theme, setTheme] = useState<"light" | "dark">(() => {

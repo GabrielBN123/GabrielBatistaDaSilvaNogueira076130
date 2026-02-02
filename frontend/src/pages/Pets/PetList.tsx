@@ -30,7 +30,7 @@ export function PetList() {
             const { data, total } = await PetFacade.getAll(nome, page, '', ITENS_POR_PAGINA);
             const lista = data.content ? data.content : data;
             
-            setPets(lista);
+            setPets(lista as Pet[]);
             setPageCount(Math.ceil(total / ITENS_POR_PAGINA));
         } catch (error) {
             console.error(error);
@@ -74,7 +74,6 @@ export function PetList() {
                                 value={nome}
                                 onChange={handleSearch}
                                 icon={Search}
-                                className="rounded-full border-none bg-transparent w-48 md:w-64 focus:ring-0 focus:w-72 transition-all duration-300"
                             />
                         </div>
                         <Button 
@@ -122,7 +121,7 @@ export function PetList() {
                                         <div className="flex justify-between items-end mb-1">
                                             <h2 className="text-3xl font-black tracking-wide drop-shadow-md">{pet.nome}</h2>
                                             <Badge className="bg-amber-500 text-white border-none text-xs font-bold px-2 py-1 mb-1">
-                                                {pet.idade} - {parseInt(pet.idade) > 1 ? 'Ano' : 'Anos'}
+                                                {pet.idade} - {pet.idade > 1 ? 'Ano' : 'Anos'}
                                             </Badge>
                                         </div>
                                         

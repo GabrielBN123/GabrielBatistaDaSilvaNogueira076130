@@ -26,7 +26,6 @@ export function LoginForm({
 	subtitle = "Faça seu login",
 	defaultUsername = "admin",
 	defaultPassword = "admin",
-	onLogin,
 }: LoginFormProps) {
 	const [username, setUsername] = useState(defaultUsername);
 	const [password, setPassword] = useState(defaultPassword);

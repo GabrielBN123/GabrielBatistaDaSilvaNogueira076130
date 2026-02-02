@@ -3,7 +3,7 @@ import { Header } from "@/components/ui/header";
 import { useAuth } from "@/context/AuthContext";
 
 export function AppLayout() {
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -3,15 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from 'react-router-dom';
-
-export interface Pet {
-  id: number;
-  nome: string;
-  raca: string;
-  idade: number;
-  foto: string | null;
-}
+import type { Pet } from "@/interfaces/pet.interface";
 
 interface PetCardProps {
   pet: Pet;
@@ -35,8 +27,6 @@ function formatIdade(idade: number): string {
 }
 
 export function PetCard({ pet }: PetCardProps) {
-
-  const navigate = useNavigate();
 
   return (
     <Card className="hover:scale-[1.02] transition-transform duration-200 cursor-pointer">

@@ -5,8 +5,8 @@ import { type ChangeEvent } from "react"
 
 type MaskType = "cpf" | "phone";
 
-interface LoginInputProps {
-  label: string
+interface InputProps {
+  label?: string
   type: "email" | "password" | "text" | "number"
   value: string
   onChange: (value: string) => void
@@ -15,6 +15,7 @@ interface LoginInputProps {
   required?: boolean
   mask?: MaskType
   maxLength?: number
+  className?: string;
 }
 
 const formatCPF = (value: string) => {
@@ -43,8 +44,9 @@ export function Input({
   icon: Icon,
   required = false,
   mask,
-  maxLength
-}: LoginInputProps) {
+  maxLength,
+  className
+}: InputProps) {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
@@ -64,13 +66,15 @@ export function Input({
   };
 
   return (
-    <div className="relative">
-      <label className="block text-sm font-bold text-amber-700 dark:text-stone-300 mb-1">
-        {label}
-      </label>
+    <div className={`relative`}>
+      {label ?(
+        <label className="block text-sm font-bold text-amber-700 dark:text-stone-300 mb-1">
+          {label}
+        </label>
+      ): ''}
 
       <div className="relative">
-        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-500 dark:text-stone-500 transition-colors duration-200" />
+        <Icon className={`${className} absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-500 dark:text-stone-500 transition-colors duration-200`} />
 
         <input
           type={type}

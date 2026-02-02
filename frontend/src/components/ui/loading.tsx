@@ -1,4 +1,4 @@
-import { Loader2, PawPrint } from "lucide-react";
+import { PawPrint } from "lucide-react";
 
 export function Loading() {
   return (

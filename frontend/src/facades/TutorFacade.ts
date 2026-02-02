@@ -2,6 +2,8 @@ import type { TutorPaginatedResponse, Tutor } from '@/interfaces/tutor.interface
 import { api } from '../services/api';
 import { BehaviorSubject } from 'rxjs';
 
+export type TutorCreateDTO = Omit<Tutor, 'id' | 'foto'>;
+
 export interface TutorState {
   tutores: TutorPaginatedResponse[];
   loading: boolean;
@@ -25,7 +27,7 @@ export class TutorFacade {
     this.tutorSubject.next({ ...this.tutorSubject.value, ...newState });
   }
 
-  static async getAll(nome = '', page = 0, size = 10): Promise<{ data: TutorPaginatedResponse[]; total: number }> {
+  static async getAll(nome = '', page = 0, size = 10): Promise<{ data: TutorPaginatedResponse; total: number }> {
     this.updateState({ loading: true, error: null });
 
     try {

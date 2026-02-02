@@ -1,7 +1,6 @@
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PetFacade, type PetCreateDTO } from '@/facades/PetFacade';
-import { useAuth } from '@/context/AuthContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input'; // Seu componente Input
 import { Button } from '@/components/ui/button';

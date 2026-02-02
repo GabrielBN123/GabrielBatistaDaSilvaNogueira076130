@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TutorFacade, type Tutor } from '@/facades/TutorFacade';
+import { TutorFacade } from '@/facades/TutorFacade';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, UserPlus, Mail, Phone, MapPin, Users, ArrowRight, Plus } from 'lucide-react';
 import { CustomPagination } from '@/components/ui/custom-pagination';
+import type { Tutor } from '@/interfaces/tutor.interface';
 
 export function TutorList() {
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ export function TutorList() {
         try {
             const {data, total} = await TutorFacade.getAll(nome, page, ITENS_POR_PAGINA);
             const lista = data.content ? data.content : data;
-            setTutores(lista);
+            setTutores(lista as Tutor[]);
             setPageCount(Math.ceil(total / ITENS_POR_PAGINA));
             
         } catch (error) {
@@ -71,7 +72,6 @@ export function TutorList() {
                                 value={nome}
                                 onChange={(val) => setNome(val)}
                                 icon={Search}
-                                className="bg-white dark:bg-stone-900 shadow-sm"
                             />
                         </div>
                         <Button 
