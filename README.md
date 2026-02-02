@@ -14,14 +14,29 @@ Este repositório contém a aplicação frontend desenvolvida para o processo se
 
 A aplicação utiliza o ecossistema moderno do React para garantir performance e manutenibilidade:
 
-* **React + TypeScript:** Base do projeto para garantir segurança de tipos e produtividade.
-* **Tailwind CSS:** Utilizado para estilização rápida e responsiva com foco em utilitários.
-* **Shadcn/UI:** Biblioteca de componentes de interface altamente acessíveis e customizáveis.
-* **Lucide React:** Conjunto de ícones leves e consistentes para toda a interface.
-* **React Router DOM:** Gestão de rotas complexas, incluindo proteção de rotas (`PrivateRoute`) e carregamento dinâmico (`Suspense`).
-* **Context API:** Utilizada para gestão de estado global através do `AuthProvider` (autenticação) e `ModalProvider`.
-* **React Toastify:** Implementado para notificações visuais (`ToastContainer`) de feedback ao usuário.
-* **Docker:** Containerização completa da aplicação para garantir isolamento e consistência do ambiente.
+## 🛠️ Tecnologias e Implementações
+
+A aplicação foi construída sobre um stack moderno e robusto, priorizando performance, acessibilidade e arquitetura reativa:
+
+### Core & Arquitetura
+* **React 19 + TypeScript:** Última versão estável do React com segurança de tipagem estática para reduzir erros em tempo de desenvolvimento.
+* **Vite:** Build tool de próxima geração para desenvolvimento rápido e bundles otimizados.
+* **Docker:** Containerização completa da aplicação para garantir isolamento, reprodutibilidade e consistência do ambiente entre desenvolvimento e produção.
+
+### Gerenciamento de Estado & Dados
+* **RxJS:** Implementação de arquitetura reativa (Facades) baseada em Observables e Subjects para gerenciamento de estado complexo e fluxos assíncronos.
+* **TanStack Query (React Query):** Gerenciamento de estado do servidor, cache, refetching automático e sincronização de dados.
+* **Axios:** Cliente HTTP robusto para comunicação com a API, permitindo interceptadores de requisição/resposta e configuração global.
+
+### Interface & Estilização
+* **Tailwind CSS:** Framework *utility-first* para estilização ágil, responsiva e consistente.
+* **Shadcn/UI + Radix UI:** Conjunto de componentes reutilizáveis construídos sobre primitivos *headless* (Radix) para garantir máxima acessibilidade (A11y) e customização.
+* **Lucide React:** Biblioteca de ícones leve e padronizada.
+* **React Toastify:** Sistema de notificações (Toasts) para feedback visual imediato das ações do usuário.
+
+### Autenticação & Rotas
+* **React Router DOM:** Roteamento declarativo com suporte a `Lazy Loading` (Suspense), rotas protegidas e navegação SPA.
+* **jwt-decode:** Decodificação de tokens JWT no frontend para extração de claims (dados do usuário) e verificação de expiração de sessão sem chamadas desnecessárias ao servidor.
 
 ---
 
@@ -37,7 +52,17 @@ Após a instalação, confirme se o serviço está ativo:
 ```bash
 docker --version
 
+docker ps
 ```
+<small>
+Se este comando retornar um erro de "pipe" ou "connection refused", o Docker Desktop ainda não terminou de inicializar.
+</small>
+
+### ATENÇÃO: Remove todos os containers parados, redes não utilizadas e imagens sem uso
+```bash
+docker system prune -a --volumes -f
+```
+<small>Remoção de qualquer vetigio para não ocorrer erro durante a inicialização do Docker</small>
 
 ### 2. Clonar o Projeto
 Clone o repositório no seu ambiente local
@@ -60,7 +85,7 @@ Build e inicialização do container
     docker-compose up -d --build
 ```
 ### 4. Acesso
-Abra o seu navegador e acesse o link gerado pelo Docker: 👉 http://localhost:3000
+Abra o seu navegador e acesse o link gerado pelo Docker: 👉 http://localhost:8080
 
 #### Estrutura de Rotas e Acessos
 
@@ -114,8 +139,26 @@ Vínculos:
 6. Testes de Facades: Caso deseje rodar testes unitários específicos para as Facades dentro do container:
 
 ```bash
-    docker exec -it [NOME_DO_CONTAINER] npm test    
+    docker exec -it frontend npm test
 ```
+
+#### Conforme solicitado:
+
+Tela inicial HealthCheck
+
+## Pets
+* **Listagem** /pets 
+* **Detalhamento** /pets/:id
+* **Cadastro** /pets/novo
+* **Edição** /pets/editar/:id
+## Tutores
+* **Listagem** /tutores
+* **Detalhamento** /tutores/:id
+* **Cadastro** /tutores/:id
+* **Edição** /tutores/:id
+## Vincular
+* **Pet ao Instrutor** /tutores/:id/pet/novo
+* **Instrutor ao Pet** /pets/:id/tutor/novo
 
 
 Desenvolvido por Gabriel Batista da Silva Nogueira - 2026
