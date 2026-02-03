@@ -1,7 +1,7 @@
 interface Foto {
   id: number;
   nome: string;
-  contentType: string;
+  contentType?: string;
   url: string;
 }
 
