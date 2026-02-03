@@ -11,11 +11,11 @@ import type { Pet } from '@/interfaces/pet.interface';
 
 export function PetList() {
     const navigate = useNavigate();
-    
+
     const [pets, setPets] = useState<Pet[]>([]);
     const [loading, setLoading] = useState(true);
     const [nome, setNome] = useState('');
-    
+
     const [page, setPage] = useState(0);
     const [pageCount, setPageCount] = useState(0);
     const ITENS_POR_PAGINA = 10;
@@ -29,7 +29,7 @@ export function PetList() {
         try {
             const { data, total } = await PetFacade.getAll(nome, page, '', ITENS_POR_PAGINA);
             const lista = data.content ? data.content : data;
-            
+
             setPets(lista as Pet[]);
             setPageCount(Math.ceil(total / ITENS_POR_PAGINA));
         } catch (error) {
@@ -54,7 +54,7 @@ export function PetList() {
     return (
         <div className="min-h-screen min-w-screen from-amber-100 via-orange-50 to-amber-100 dark:from-stone-950 dark:via-neutral-900 dark:to-stone-950 p-4 font-sans">
             <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-                
+
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
                     <div className="text-center md:text-left">
                         <h1 className="text-4xl md:text-5xl font-black text-amber-600 dark:text-amber-500 tracking-tighter drop-shadow-sm flex items-center gap-3 justify-center md:justify-start">
@@ -68,17 +68,17 @@ export function PetList() {
 
                     <div className="flex items-center gap-3 bg-white/60 dark:bg-stone-900/60 p-2 rounded-full shadow-xl backdrop-blur-md border border-white/20">
                         <div className="relative group">
-                            <Input 
-                                type="text" 
-                                placeholder="Procurar amigo..." 
+                            <Input
+                                type="text"
+                                placeholder="Procurar amigo..."
                                 value={nome}
                                 onChange={handleSearch}
                                 icon={Search}
                             />
                         </div>
-                        <Button 
+                        <Button
                             onClick={() => navigate('/pets/novo')}
-                            size="icon" 
+                            size="icon"
                             className="rounded-full h-12 w-12 bg-gradient-to-r from-amber-500 to-orange-600 hover:scale-110 transition-transform shadow-lg shadow-orange-500/30"
                         >
                             <Plus className="w-6 h-6 text-gray dark:text-white" />
@@ -95,7 +95,7 @@ export function PetList() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {pets.map((pet, index) => (
-                            <div 
+                            <div
                                 key={pet.id}
                                 onClick={() => navigate(`/pets/${pet.id}`)}
                                 className="group relative h-96 w-full cursor-pointer perspective-1000"
@@ -104,9 +104,9 @@ export function PetList() {
                                 <div className="relative h-full w-full rounded-[2rem] overflow-hidden bg-white dark:bg-stone-800 shadow-xl transition-all duration-500 ease-out transform group-hover:-translate-y-3 group-hover:rotate-1 group-hover:shadow-2xl border-4 border-white dark:border-stone-700">
                                     <div className="absolute inset-0 bg-stone-200">
                                         {pet.foto?.url ? (
-                                            <img 
-                                                src={pet.foto.url} 
-                                                alt={pet.nome} 
+                                            <img
+                                                src={pet.foto.url}
+                                                alt={pet.nome}
                                                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                         ) : (
@@ -121,10 +121,10 @@ export function PetList() {
                                         <div className="flex justify-between items-end mb-1">
                                             <h2 className="text-3xl font-black tracking-wide drop-shadow-md">{pet.nome}</h2>
                                             <Badge className="bg-amber-500 text-white border-none text-xs font-bold px-2 py-1 mb-1">
-                                                {pet.idade} - {pet.idade > 1 ? 'Ano' : 'Anos'}
+                                                {pet.idade} - {pet.idade > 1 ? 'Anos' : 'Ano'}
                                             </Badge>
                                         </div>
-                                        
+
                                         <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-300 opacity-0 group-hover:opacity-100">
                                             <p className="text-amber-200 font-medium flex items-center gap-2 text-sm mb-2">
                                                 <Sparkles className="w-3 h-3" /> {pet.raca}
@@ -133,7 +133,7 @@ export function PetList() {
                                                 Ver Detalhes
                                             </Button>
                                         </div>
-                                        
+
                                         <div className="group-hover:hidden flex items-center gap-2 text-sm text-stone-300">
                                             <span className="truncate">{pet.raca}</span>
                                         </div>
@@ -143,7 +143,7 @@ export function PetList() {
                         ))}
 
                         {pets.length < ITENS_POR_PAGINA && (
-                             <div 
+                            <div
                                 onClick={() => navigate('/pets/novo')}
                                 className="h-96 w-full rounded-[2rem] border-4 border-dashed border-amber-300 dark:border-stone-700 flex flex-col items-center justify-center cursor-pointer hover:bg-amber-50 dark:hover:bg-stone-900 transition-colors group"
                             >

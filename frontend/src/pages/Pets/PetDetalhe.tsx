@@ -1,45 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PetFacade } from '@/facades/PetFacade';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     ArrowLeft,
-    Mail,
-    Phone,
-    MapPin,
-    User,
-    Dog,
-    Calendar,
     Edit3,
     Trash2,
     UserPlus,
-    PawPrint,
-    Loader2,
-    Users
 } from 'lucide-react';
 import { Loading } from '@/components/ui/loading';
 import { TutorPetFacade } from '@/facades/TutorPetFacade';
 import { toast } from 'react-toastify';
 import { useConfirm } from '@/context/ModalContext';
 import type { Pet } from '@/interfaces/pet.interface';
+import { ListaTutores } from '@/components/pets/ListaTutores';
+import { PetDetail } from '@/components/pets/PetDetail';
 
 export function PetDetalhe() {
     const { id } = useParams();
     const navigate = useNavigate();
-
     const [pet, setPet] = useState<Pet | null>(null);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const { confirm } = useConfirm();
 
     useEffect(() => {
-        if (id) {
-            carregarDetalhes(id);
-        }
+        if (id) carregarDetalhes(id);
     }, [id]);
 
     async function carregarDetalhes(petId: string) {
@@ -48,18 +35,14 @@ export function PetDetalhe() {
             const data = await PetFacade.getById(Number(petId));
             setPet(data);
         } catch (err) {
-            console.error(err);
-            setError("Não foi possível carregar os detalhes do pet.");
+            toast.error("Não foi possível carregar os detalhes.");
         } finally {
             setLoading(false);
         }
     }
 
-    const handleVoltar = () => navigate(-1);
-    const handleEditar = () => {
-        navigate(`/pets/editar/${id}`);
-    };
-
+    const handleVoltar = () => navigate('/pets');
+    
     const handleExcluir = async () => {
 
         confirm({
@@ -74,6 +57,7 @@ export function PetDetalhe() {
                     try {
                         await PetFacade.delete(Number(id));
                         toast.success('Pet Removido.');
+                        navigate('/pets');
                     } catch (error) {
                         console.error(error);
                         toast.error('Erro ao excluir o pet.');
@@ -83,10 +67,6 @@ export function PetDetalhe() {
                 }
             }
         })
-    };
-
-    const handleCadastrarTutor = () => {
-        navigate(`/pets/${id}/tutor/novo`);
     };
 
     async function handleUnlink(tutorId: number) {
@@ -116,211 +96,71 @@ export function PetDetalhe() {
 
     }
 
-    if (loading) {
-        return (<Loading />);
-    }
+    const handleCadastrarTutor = () => {
+        navigate(`/pets/${id}/tutor/novo`);
+    };
 
-    if (error || !pet) {
-        return (
-            <div className="min-h-screen min-w-screen from-amber-100 to-orange-200 p-4 flex flex-col items-center justify-center text-center">
-                <Dog className="w-16 h-16 text-stone-400 mb-4 opacity-50" />
-                <h2 className="text-2xl font-bold text-stone-800 mb-4">{error || "Pet não encontrado"}</h2>
-                <Button onClick={() => navigate('/pets')}>Voltar para o Início</Button>
-            </div>
-        );
-    }
+    if (loading) return <Loading />;
+    if (!pet) return <div className="p-20 text-center">Pet não encontrado</div>;
 
     return (
-        <div className="min-h-screen min-w-screen from-amber-100 to-orange-200 dark:from-stone-950 dark:to-neutral-900 p-4 relative overflow-hidden">
-            <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <Button
-                        variant="ghost"
-                        onClick={handleVoltar}
-                        className="gap-2 hover:bg-white/20 text-stone-700 dark:text-stone-200 pl-0 sm:pl-4"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        Voltar
+        <div className="min-h-screen min-w-screen text-stone-900 dark:text-stone-100">
+            <div className="sticky top-0 z-10 border-b border-stone-200 dark:border-stone-800">
+                <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                    <Button variant="ghost" onClick={handleVoltar} className="group gap-2">
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                        Painel de Pets
                     </Button>
-
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <Button
-                            variant="outline"
-                            onClick={handleEditar}
-                            className="flex-1 sm:flex-none border-amber-300 hover:bg-amber-100 text-amber-900 dark:border-stone-600 dark:text-stone-200 dark:hover:bg-stone-800"
-                        >
-                            <Edit3 className="w-4 h-4 mr-2" />
-                            Editar
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => navigate(`/pets/editar/${id}`)}>
+                            <Edit3 className="w-4 h-4 mr-2" /> Editar
                         </Button>
-
-                        <Button
-                            variant="destructive"
-                            onClick={handleExcluir}
-                            disabled={deleting}
-                            className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600 text-amber-900 dark:text-stone-200"
-                        >
-                            {deleting ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                                <Trash2 className="w-4 h-4 mr-2" />
-                            )}
-                            Remover
+                        <Button variant="destructive" size="sm" onClick={handleExcluir} disabled={deleting}>
+                            <Trash2 className="w-4 h-4 mr-2" /> Excluir
                         </Button>
                     </div>
                 </div>
+            </div>
 
-                <div className="relative">
-                    <Card className="border-none shadow-2xl bg-white/80 dark:bg-stone-900/80 backdrop-blur-md overflow-visible mt-12 md:mt-0">
-                        <div className="flex flex-col md:flex-row">
+            <main className="max-w-7xl mx-auto p-4 md:p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <PetDetail pet={pet} />
 
-                            <div className="relative w-full md:w-auto flex justify-center md:block p-6 md:p-0 md:-mt-8 md:-ml-8 mb-4 md:mb-0">
-                                <div className="w-64 h-64 md:w-72 md:h-72 rounded-2xl shadow-2xl overflow-hidden border-4 border-white dark:border-stone-700 bg-stone-200">
-                                    {pet.foto?.url ? (
-                                        <img
-                                            src={pet.foto.url}
-                                            alt={pet.nome}
-                                            className="w-full h-full object-cover transition-transform hover:scale-110 duration-500"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-stone-400 bg-stone-100 dark:bg-stone-800">
-                                            <PawPrint className="w-24 h-24 opacity-20" />
-                                        </div>
-                                    )}
+                    <div className="lg:col-span-8 space-y-8">
+                        
+                        <div className="bg-stone-100/50 dark:bg-stone-900/50 rounded-[32px] p-6 md:p-8 border border-stone-200 dark:border-stone-800">
+                            <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h2 className="text-2xl font-bold flex items-center gap-3">
+                                        Tutores Responsáveis
+                                        <Badge variant="secondary" className="rounded-full">{pet.tutores?.length || 0}</Badge>
+                                    </h2>
+                                    <p className="text-sm text-stone-500">Pessoas vinculadas ao cuidado de {pet.nome}</p>
                                 </div>
+                                <Button onClick={handleCadastrarTutor} className="rounded-full bg-stone-900 dark:bg-amber-500 hover:bg-stone-800 dark:hover:bg-amber-600 text-white">
+                                    <UserPlus className="w-4 h-4 mr-2" /> Adicionar
+                                </Button>
                             </div>
 
-                            <div className="flex-1 p-6 md:py-8 md:pr-8 flex flex-col gap-6">
-                                <div className="flex flex-wrap items-start justify-between gap-4">
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-1">
-                                            <h1 className="text-4xl md:text-5xl font-extrabold text-stone-800 dark:text-stone-100 tracking-tight">
-                                                {pet.nome}
-                                            </h1>
+                            <div className="grid gap-4">
+                                {pet.tutores && pet.tutores.length > 0 ? (
+                                    pet.tutores.map((tutor) => (
+                                        <ListaTutores tutor={tutor} Unlink={handleUnlink} />
+                                    ))
+                                ) : (
+                                    <div className="py-12 flex flex-col items-center text-center bg-white dark:bg-stone-900 rounded-3xl border-2 border-dashed border-stone-200 dark:border-stone-800">
+                                        <div className="w-16 h-16 bg-amber-50 dark:bg-stone-800 rounded-full flex items-center justify-center mb-4">
+                                            <UserPlus className="text-amber-500 w-8 h-8" />
                                         </div>
-                                        <Badge variant="outline" className="text-sm border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-transparent">
-                                            Cod. #{pet.id}
-                                        </Badge>
+                                        <p className="font-medium">Nenhum tutor vinculado</p>
+                                        <p className="text-sm text-stone-500 max-w-[240px]">Vincule um responsável para gerenciar as notificações de {pet.nome}.</p>
                                     </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-stone-800/50 border border-amber-100 dark:border-stone-700">
-                                        <div className="p-3 bg-white dark:bg-stone-700 rounded-full shadow-sm">
-                                            <Dog className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Raça</p>
-                                            <p className="text-lg font-semibold text-stone-800 dark:text-stone-200">{pet.raca}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50 dark:bg-stone-800/50 border border-amber-100 dark:border-stone-700">
-                                        <div className="p-3 bg-white dark:bg-stone-700 rounded-full shadow-sm">
-                                            <Calendar className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Idade</p>
-                                            <p className="text-lg font-semibold text-stone-800 dark:text-stone-200">
-                                                {pet.idade} {pet.idade === 1 ? 'ano' : 'anos'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
-                    </Card>
-                </div>
 
-                <div className="space-y-4 pt-4">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-primary/10 rounded-lg">
-                                <User className="w-6 h-6 text-primary" />
-                            </div>
-                            <h2 className="text-2xl font-bold text-stone-800 dark:text-stone-100">
-                                Tutores Responsáveis
-                            </h2>
-                        </div>
-
-                        <Button onClick={handleCadastrarTutor} className="gap-2 bg-primary hover:bg-primary/90 shadow-md shadow-amber-900/20">
-                            <UserPlus className="w-4 h-4" />
-                            Cadastrar Tutor
-                        </Button>
                     </div>
-
-                    {pet.tutores && pet.tutores.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {pet.tutores.map((tutor) => (
-                                <Card key={tutor.id} className="group hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer dark:bg-stone-900/75">
-                                    <CardHeader className="flex flex-row items-center gap-4 pb-3">
-                                        <Avatar className="h-14 w-14 border-2 border-white shadow-md">
-                                            {tutor.foto?.url ? (
-                                                <AvatarImage src={tutor.foto.url} alt={tutor.nome} className="object-cover" />
-                                            ) : (
-                                                <AvatarFallback className="bg-gradient-to-br from-amber-200 to-orange-300 text-amber-900 font-bold">
-                                                    {tutor.nome.substring(0, 2).toUpperCase()}
-                                                </AvatarFallback>
-                                            )}
-                                        </Avatar>
-                                        <div className="overflow-hidden">
-                                            <CardTitle className="text-lg font-bold truncate text-stone-800 dark:text-stone-100" title={tutor.nome}>
-                                                {tutor.nome}
-                                            </CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="space-y-3 pt-2 text-sm bg-stone-50/50 dark:bg-stone-900/30">
-                                        <div className="flex items-center gap-3 text-stone-600 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-200 transition-colors">
-                                            <Mail className="w-4 h-4 text-amber-500 shrink-0" />
-                                            <span className="truncate" title={tutor.email}>{tutor.email}</span>
-                                        </div>
-                                        <div className="flex items-center gap-3 text-stone-600 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-200 transition-colors">
-                                            <Phone className="w-4 h-4 text-amber-500 shrink-0" />
-                                            <span>{tutor.telefone}</span>
-                                        </div>
-                                        {tutor.endereco && (
-                                            <div className="flex items-start gap-3 text-stone-600 dark:text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-200 transition-colors">
-                                                <MapPin className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                                                <span className="line-clamp-2" title={tutor.endereco}>{tutor.endereco}</span>
-                                            </div>
-                                        )}
-                                        <div className="mt-1 h-0 group-hover:h-auto overflow-hidden transition-all duration-300 opacity-0 group-hover:opacity-100">
-                                            <Button size="sm" className="mb-2 w-full rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm border border-white/30 text-amber-900 dark:text-stone-200" onClick={() => navigate(`/tutores/${tutor.id}`)} >
-                                                <Users className="w-4 h-4 mr-2" />
-                                                Ver Detalhes
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                onClick={() => handleUnlink(tutor.id)}
-                                                disabled={deleting}
-                                                className="w-full flex-1 text-stone-700 dark:text-stone-200 sm:flex-none bg-red-500 hover:bg-red-600"
-                                            >
-                                                {deleting ? (
-                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                                ) : (
-                                                    <Trash2 className="w-4 h-4 mr-2" />
-                                                )}
-                                                Desvincular
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-amber-200 dark:border-stone-700 rounded-xl bg-white/30 dark:bg-stone-900/30">
-                            <div className="p-4 bg-amber-100 dark:bg-stone-800 rounded-full mb-4">
-                                <UserPlus className="w-8 h-8 text-amber-600 dark:text-amber-400" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-stone-800 dark:text-stone-200">Nenhum tutor vinculado</h3>
-                            <p className="text-muted-foreground mb-6 text-center max-w-xs">
-                                Este pet precisa de um responsável. Cadastre um tutor agora mesmo.
-                            </p>
-                            <Button variant="outline" onClick={handleCadastrarTutor} className="border-amber-300 text-amber-800 hover:bg-amber-50">
-                                Adicionar o primeiro tutor
-                            </Button>
-                        </div>
-                    )}
                 </div>
             </main>
         </div>
