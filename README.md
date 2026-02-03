@@ -12,10 +12,6 @@ Este repositório contém a aplicação frontend desenvolvida para o processo se
 
 ## 🛠️ Tecnologias e Implementações
 
-A aplicação utiliza o ecossistema moderno do React para garantir performance e manutenibilidade:
-
-## 🛠️ Tecnologias e Implementações
-
 A aplicação foi construída sobre um stack moderno e robusto, priorizando performance, acessibilidade e arquitetura reativa:
 
 ### Core & Arquitetura
@@ -45,10 +41,18 @@ A aplicação foi construída sobre um stack moderno e robusto, priorizando perf
 Siga os passos abaixo para configurar e rodar a aplicação localmente:
 
 ### 1. Pré-requisitos
+Certifique-se de que você possui o **Git** instalado:
+- [Download Git](https://git-scm.com/install/windows)
+
+Após a instalação, confirme que o Git está instalado, no seu terminal execute:
+```bash
+git --version
+```
+
 Certifique-se de que você possui o **Docker** instalado:
 - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-Após a instalação, confirme se o serviço está ativo:
+Após a instalação, confirme se o serviço está ativo, no seu terminal execute:
 ```bash
 docker --version
 
@@ -58,6 +62,11 @@ docker ps
 Se este comando retornar um erro de "pipe" ou "connection refused", o Docker Desktop ainda não terminou de inicializar.
 </small>
 
+### ATENÇÃO: Pare todos os containers que estiverem executando
+```bash
+docker rm -f $(docker ps -aq)
+```
+
 ### ATENÇÃO: Remove todos os containers parados, redes não utilizadas e imagens sem uso
 ```bash
 docker system prune -a --volumes -f
@@ -65,24 +74,24 @@ docker system prune -a --volumes -f
 <small>Remoção de qualquer vetigio para não ocorrer erro durante a inicialização do Docker</small>
 
 ### 2. Clonar o Projeto
-Clone o repositório no seu ambiente local
+Clone o repositório no seu ambiente local, em um diretório abra o seu terminal e execute:
 ```bash
-    git clone https://github.com/GabrielBN123/GabrielBatistaDaSilvaNogueira076130.git
+git clone https://github.com/GabrielBN123/GabrielBatistaDaSilvaNogueira076130.git
 ```
 Acesse a pasta do repositório
 ```bash
-    cd GabrielBatistaDaSilvaNogueira076130
+cd GabrielBatistaDaSilvaNogueira076130
 ```
 
 ### 3. Inicialização via Docker
 Limpa containers, imagens e volumes antigos do projeto
 ```bash
-    docker-compose down --rmi all --volumes --remove-orphans
+docker-compose down --rmi all --volumes --remove-orphans
 ```
 
 Build e inicialização do container
 ```bash
-    docker-compose up -d --build
+docker-compose up -d --build
 ```
 ### 4. Acesso
 Abra o seu navegador e acesse o link gerado pelo Docker: 👉 http://localhost:8080
@@ -128,9 +137,9 @@ Vínculos:
 
     *    Realize o login para entrar na área protegida (Dashboard).
 
-    *    Acesse a tela de Tutores e realize o cadastro de um novo tutor.
-
     *    Acesse a tela de Pets e cadastre um animal.
+
+    *    Acesse a tela de Tutores e realize o cadastro de um novo tutor.
 
     *    Utilize o VinculoManager para associar o tutor ao pet recém-criado.
 
@@ -139,7 +148,7 @@ Vínculos:
 6. Testes de Facades: Caso deseje rodar testes unitários específicos para as Facades dentro do container:
 
 ```bash
-    docker exec -it frontend npm test
+docker exec -it frontend npm test
 ```
 
 #### Conforme solicitado:
