@@ -131,11 +131,13 @@ Vínculos:
 
 3. Acesso ao Login: Abra o navegador no endereço indicado. A aplicação deve carregar a tela de login.
 
+    *    Ao acessar a primeira vez o sistema a cada vez que está próximo de encerrar o token, é automaticamente renovado
+
 4. Verificar Saúde: Acesse a rota /health para confirmar se o servidor frontend está respondendo corretamente.
 
     Fluxo de Operação:
 
-    *    Realize o login para entrar na área protegida (Dashboard).
+    *    Realize o login para entrar na área protegida (Dashboard).    
 
     *    Acesse a tela de Pets e cadastre um animal.
 
@@ -153,21 +155,67 @@ docker exec -it frontend npm test
 
 #### Conforme solicitado:
 
-Tela inicial HealthCheck
+## Tela inicial - Dashboard
+* **HealthCheck** /
+<small>
+Tela pensada para início da aplicação, informando a quantidade de pets e tutores cadastrados.
+Também exibindo o status atual do ambiente.
+</small>
 
 ## Pets
 * **Listagem** /pets 
+
+<small>Lista de Pets com filtro de nome e raça</small>
+
 * **Detalhamento** /pets/:id
+
+<small>Detalhes do Pet, tutores vinculados e exclusão</small>
+
 * **Cadastro** /pets/novo
+
+<small>Cadastro de Pet</small>
+
 * **Edição** /pets/editar/:id
+
+<small>Edição de Pet</small>
+
 ## Tutores
 * **Listagem** /tutores
+
+<small>Lista de Tutores com filtro por nome</small>
+
 * **Detalhamento** /tutores/:id
+
+<small>Detalhes do Tutor, pets vinculados e exclusão</small>
+
 * **Cadastro** /tutores/:id
+
+<small>Cadastro do tutor</small>
+
 * **Edição** /tutores/:id
+
+<small>Edição do tutor</small>
+
 ## Vincular
 * **Pet ao Instrutor** /tutores/:id/pet/novo
+
+<small>Exibição do tutor com a listagem de pets para vincular</small>
+
 * **Instrutor ao Pet** /pets/:id/tutor/novo
+
+<small>Exibição do pet com a listagem de tutores para vincular</small>
+
+### Observação sobre o sistema
+O sistema possui um layout intuitivo, com base em cards.
+
+O tema padrão **dark**, com adaptabilidade para se adequar ao tema do navegador.
+Padrão de cores: O tema "**amber**" foi selecionado para lembrar a um dos pets famosos (**Cachorro caramelo**), a intensidade da cor foi selecionada para ter maior contraste com o Tema padrão (**Dark**)
+
+O sistema foi pensado utilizando de base a api de Pets [text](https://pet-manager-api.geia.vip/).
+
+O sistema possui a possibilidade de gerenciamento de pets como Cadastro, Edição, Exclusão, e Vínculos de pets e tutores.
+
+Tela de listagem de Pets e Tutores foram criadas com layout diferente para não haver confusão no momento da visualização.
 
 
 Desenvolvido por Gabriel Batista da Silva Nogueira - 2026
