@@ -15,7 +15,6 @@ export function ListaTutores({tutor, Unlink}:ListaTutoresProps) {
 
     return (
         <div
-            key={tutor.id}
             className="group bg-white dark:bg-stone-900 hover:bg-amber-50/50 dark:hover:bg-stone-800/50 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 transition-all duration-300 flex flex-col md:flex-row items-center gap-6"
         >
             <Avatar className="h-16 w-16 border-2 border-amber-100">

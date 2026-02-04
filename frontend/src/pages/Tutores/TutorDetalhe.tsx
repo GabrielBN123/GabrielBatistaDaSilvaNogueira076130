@@ -127,12 +127,12 @@ export function TutorDetalhe() {
 
             <div className="sticky top-0 z-10 border-b border-stone-200 dark:border-stone-800 xs:d-flex">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <Button variant="ghost" onClick={handleVoltar} className="group gap-2">
+                    <Button variant="destructive" onClick={handleVoltar} className="group gap-2">
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Painel de Tutores
                     </Button>
                     <div className="lg:flex lg:gap-2 sm:ml-10">
-                        <Button variant="outline" size="sm" onClick={handleEditar} className='sm:mb-2'>
+                        <Button variant="destructive" size="sm" onClick={handleEditar} className='sm:mb-2'>
                             <Edit3 className="w-4 h-4 mr-2" /> Editar
                         </Button>
                         <Button variant="destructive" size="sm" onClick={handleExcluir} disabled={deleting}>

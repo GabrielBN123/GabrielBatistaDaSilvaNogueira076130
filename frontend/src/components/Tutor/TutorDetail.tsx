@@ -12,13 +12,16 @@ export function TutorDetail({ tutor }: TutorDetailProp) {
         <div className="lg:col-span-4 space-y-6">
 
             <div className="relative group">
-                <div className="aspect-[4/5] rounded-[32px] overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 bg-stone-200 relative">
+                <div className="aspect-square rounded-[32px] overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 bg-stone-200 relative">
                     {tutor.foto?.url ? (
-                        <img
-                            src={tutor.foto.url}
-                            alt={tutor.nome}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
+                        <div className="w-full h-full bg-stone-900">
+                            <div className={`w-full h-full float-left absolute blur-sm transition-transform duration-700 bg-cover bg-center bg-no-repeat`} style={{ backgroundImage: `url('${tutor.foto?.url}')` }}></div>
+                            <img
+                                src={tutor.foto.url}
+                                alt={tutor.nome}
+                                className="w-full h-full absolute object-contain transition-transform duration-700 group-hover:scale-105"
+                            />
+                        </div>
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-stone-100 dark:bg-stone-800">
                             <User className="w-24 h-24 text-stone-300 dark:text-stone-600" />

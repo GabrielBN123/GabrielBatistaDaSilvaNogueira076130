@@ -170,7 +170,7 @@ export function VinculoManager() {
             <main className="max-w-4xl mx-auto py-8 px-4">
 
                 <div className="flex items-center gap-4 mb-8">
-                    <Button variant="ghost" onClick={() => navigate(-1)} className="rounded-full h-10 w-10 p-0">
+                    <Button variant="destructive" onClick={() => navigate(-1)} className="rounded-full h-10 w-10 p-0">
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
                     <div>
@@ -225,7 +225,7 @@ export function VinculoManager() {
                             <h2 className="text-sm font-bold uppercase tracking-wider text-stone-400">
                                 Buscar {targetLabel} para vincular
                             </h2>
-                            <Button variant="link" size="sm" onClick={handleCriarNovo} className="text-primary h-auto p-0">
+                            <Button variant="destructive" size="sm" onClick={handleCriarNovo} className="text-white h-auto p-0">
                                 <Plus className="w-3 h-3 mr-1" />
                                 Cadastrar Novo
                             </Button>
@@ -252,7 +252,7 @@ export function VinculoManager() {
                             {!loadingSearch && nome.length > 2 && targetList.length === 0 && (
                                 <div className="text-center py-8 border-2 border-dashed border-stone-200 rounded-xl">
                                     <p className="text-stone-500">Nenhum {targetLabel} encontrado.</p>
-                                    <Button variant="outline" onClick={handleCriarNovo} className="mt-2">
+                                    <Button variant="destructive" onClick={handleCriarNovo} className="mt-2">
                                         Cadastrar Novo {targetLabel}
                                     </Button>
                                 </div>
@@ -298,7 +298,7 @@ export function VinculoManager() {
                                             size="sm"
                                             onClick={() => handleVincular(target.id)}
                                             disabled={linkingId === target.id}
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-primary hover:bg-primary/90"
+                                            className="opacity-0 text-white group-hover:opacity-100 transition-opacity bg-primary hover:bg-primary/90"
                                         >
                                             {linkingId === target.id ? (
                                                 <Loader2 className="w-4 h-4 animate-spin" />

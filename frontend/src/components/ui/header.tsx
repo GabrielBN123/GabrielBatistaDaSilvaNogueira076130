@@ -41,7 +41,6 @@ export function Header({ onSignOut }: HeaderProps) {
   const toggleTheme = () => {
     setTheme(prev => prev === "light" ? "dark" : "light");
   };
-  // ----------------------
 
   const isActive = (path: string) => {
     if (path === '/' && location.pathname === '/') return true;
@@ -107,11 +106,11 @@ export function Header({ onSignOut }: HeaderProps) {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-full text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-stone-500 dark:bg-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               title={theme === 'light' ? 'Mudar para modo escuro' : 'Mudar para modo claro'}
             >
               {theme === 'light' ? (
-                <Sun className="w-5 h-5 text-amber-500 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Sun className="w-5 h-5 text-white rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               ) : (
                 <Moon className="w-5 h-5 text-blue-400 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               )}

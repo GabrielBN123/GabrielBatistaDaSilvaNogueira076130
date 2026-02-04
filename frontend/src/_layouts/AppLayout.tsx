@@ -6,7 +6,7 @@ export function AppLayout() {
   const { signOut } = useAuth();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen min-w-screen flex flex-col">
       <Header 
         onSignOut={signOut} 
       />

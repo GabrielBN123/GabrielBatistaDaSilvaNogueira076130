@@ -42,7 +42,7 @@ export function PetDetalhe() {
     }
 
     const handleVoltar = () => navigate('/pets');
-    
+
     const handleExcluir = async () => {
 
         confirm({
@@ -101,18 +101,27 @@ export function PetDetalhe() {
     };
 
     if (loading) return <Loading />;
-    if (!pet) return <div className="p-20 text-center">Pet não encontrado</div>;
+    if (!pet) return <div className="p-20 min-w-screen text-center">
+        <h2 className="text-2xl font-bold items-center gap-3 text-center mb-4">
+            Pet não encontrado!
+            <Badge variant="secondary" className="rounded-full"></Badge>
+        </h2>
+        <Button variant="ghost" onClick={handleVoltar} className="group gap-2">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Painel de Pets
+        </Button>
+    </div>;
 
     return (
         <div className="min-h-screen min-w-screen text-stone-900 dark:text-stone-100">
             <div className="sticky top-0 z-10 border-b border-stone-200 dark:border-stone-800">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <Button variant="ghost" onClick={handleVoltar} className="group gap-2">
+                    <Button variant="destructive" onClick={handleVoltar} className="group gap-2">
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Painel de Pets
                     </Button>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => navigate(`/pets/editar/${id}`)}>
+                        <Button variant="destructive" size="sm" onClick={() => navigate(`/pets/editar/${id}`)}>
                             <Edit3 className="w-4 h-4 mr-2" /> Editar
                         </Button>
                         <Button variant="destructive" size="sm" onClick={handleExcluir} disabled={deleting}>
@@ -124,21 +133,21 @@ export function PetDetalhe() {
 
             <main className="max-w-7xl mx-auto p-4 md:p-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    
+
                     <PetDetail pet={pet} />
 
                     <div className="lg:col-span-8 space-y-8">
-                        
+
                         <div className="bg-stone-100/50 dark:bg-stone-900/50 rounded-[32px] p-6 md:p-8 border border-stone-200 dark:border-stone-800">
                             <div className="flex items-center justify-between mb-8">
                                 <div>
-                                    <h2 className="text-2xl font-bold flex items-center gap-3">
+                                    <h2 className="text-2xl font-bold flex items-center gap-3 dark:text-light">
                                         Tutores Responsáveis
                                         <Badge variant="secondary" className="rounded-full">{pet.tutores?.length || 0}</Badge>
                                     </h2>
                                     <p className="text-sm text-stone-500">Pessoas vinculadas ao cuidado de {pet.nome}</p>
                                 </div>
-                                <Button onClick={handleCadastrarTutor} className="rounded-full bg-stone-900 dark:bg-amber-500 hover:bg-stone-800 dark:hover:bg-amber-600 text-white">
+                                <Button onClick={handleCadastrarTutor} className="rounded-full light:bg-stone-900 dark:bg-orange-500 hover:bg-stone-800 dark:hover:bg-orange-600 text-white">
                                     <UserPlus className="w-4 h-4 mr-2" /> Adicionar
                                 </Button>
                             </div>
@@ -146,12 +155,12 @@ export function PetDetalhe() {
                             <div className="grid gap-4">
                                 {pet.tutores && pet.tutores.length > 0 ? (
                                     pet.tutores.map((tutor) => (
-                                        <ListaTutores tutor={tutor} Unlink={handleUnlink} />
+                                        <ListaTutores tutor={tutor} Unlink={handleUnlink} key={tutor.id}/>
                                     ))
                                 ) : (
                                     <div className="py-12 flex flex-col items-center text-center bg-white dark:bg-stone-900 rounded-3xl border-2 border-dashed border-stone-200 dark:border-stone-800">
-                                        <div className="w-16 h-16 bg-amber-50 dark:bg-stone-800 rounded-full flex items-center justify-center mb-4">
-                                            <UserPlus className="text-amber-500 w-8 h-8" />
+                                        <div className="w-16 h-16 bg-orange-50 dark:bg-stone-800 rounded-full flex items-center justify-center mb-4">
+                                            <UserPlus className="text-orange-500 w-8 h-8" />
                                         </div>
                                         <p className="font-medium">Nenhum tutor vinculado</p>
                                         <p className="text-sm text-stone-500 max-w-[240px]">Vincule um responsável para gerenciar as notificações de {pet.nome}.</p>

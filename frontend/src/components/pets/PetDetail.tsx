@@ -12,7 +12,10 @@ export function PetDetail({pet}:PetDetailProps) {
             <div className="relative group">
                 <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-stone-800 bg-stone-100 relative">
                     {pet.foto?.url ? (
-                        <img src={pet.foto.url} alt={pet.nome} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        <div className={`w-full h-full`}>
+                            <div className={`w-full h-full float-left absolute blur-sm transition-transform duration-700 bg-cover bg-center bg-no-repeat`} style={{ backgroundImage: `url('${pet.foto?.url}')` }}></div>
+                            <img src={pet.foto.url} alt={pet.nome} className="absolute w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" />
+                        </div>
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-amber-50 dark:bg-stone-900">
                             <PawPrint className="w-20 h-20 text-amber-200 dark:text-stone-800" />

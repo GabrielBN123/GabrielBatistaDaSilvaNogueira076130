@@ -243,7 +243,7 @@ export function TutorForm() {
 						<CardFooter className="flex justify-between gap-4 mt-2">
 							<Button
 								type="button"
-								variant="outline"
+								variant="destructive"
 								onClick={() => navigate(-1)}
 								className="w-full sm:w-auto"
 							>
@@ -253,7 +253,8 @@ export function TutorForm() {
 
 							<Button
 								type="submit"
-								className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90"
+								variant="destructive"
+								className="w-full sm:w-auto bg-primary dark:text-primary-foreground hover:bg-primary/90"
 								disabled={loading}
 							>
 								{loading ? (

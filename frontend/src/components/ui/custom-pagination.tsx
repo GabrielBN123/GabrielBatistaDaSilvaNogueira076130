@@ -68,7 +68,7 @@ export function CustomPagination({
       aria-label="Paginação"
     >
       <Button
-        variant="outline"
+        variant="destructive"
         size="icon-sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={!canGoPrevious}
@@ -90,7 +90,8 @@ export function CustomPagination({
           ) : (
             <Button
               key={`page-${pageNum}`}
-              variant={currentPage === pageNum ? "default" : "ghost"}
+              variant={currentPage === pageNum ? "ghost" : "destructive"}
+              className={currentPage === pageNum ? "bg-amber-500" : ""}
               size="icon-sm"
               onClick={() => onPageChange(pageNum as number)}
               aria-label={`Ir para página ${(pageNum as number) + 1}`}
@@ -103,7 +104,7 @@ export function CustomPagination({
       </div>
 
       <Button
-        variant="outline"
+        variant="destructive"
         size="icon-sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={!canGoNext}
