@@ -55,7 +55,7 @@ export function TutorList() {
                             <div className="p-3 bg-amber-500 rounded-xl shadow-lg shadow-amber-500/30 rotate-3">
                                 <Users className="w-8 h-8 text-white" />
                             </div>
-                            <h1 className="text-4xl font-extrabold text-stone-800 dark:text-stone-100">
+                            <h1 className="text-4xl font-extrabold light:text-stone-800 dark:text-stone-100">
                                 Rede de Tutores
                             </h1>
                         </div>
@@ -63,23 +63,23 @@ export function TutorList() {
                             Listagem de Tutores.
                         </p>
                     </div>
-
-                    <div className="flex gap-3 w-full md:w-auto">
-                        <div className="flex-1 md:w-64">
-                             <Input 
-                                type="text" 
-                                placeholder="Buscar por nome..." 
+                    
+                    <div className="flex items-center gap-3 bg-white/60 dark:bg-stone-900/60 p-2 rounded-full shadow-xl backdrop-blur-md border border-white/20">
+                        <div className="relative group">
+                            <Input
+                                type="text"
+                                placeholder="Buscar por nome..."
                                 value={nome}
                                 onChange={(val) => setNome(val)}
                                 icon={Search}
                             />
                         </div>
-                        <Button 
+                        <Button
                             onClick={() => navigate('/tutores/novo')}
-                            className="mt-2 bg-stone-800 text-stone-400 hover:bg-stone-700 text-ambar shadow-lg dark:bg-white dark:text-white-900"
+                            size="icon"
+                            className="rounded-full h-12 w-12 bg-gradient-to-r from-amber-500 to-orange-600 hover:scale-110 transition-transform shadow-lg shadow-orange-500/30"
                         >
-                            <UserPlus className="w-4 h-4 mr-2" />
-                            Novo
+                            <Plus className="w-6 h-6 text-gray dark:text-white" />
                         </Button>
                     </div>
                 </div>
