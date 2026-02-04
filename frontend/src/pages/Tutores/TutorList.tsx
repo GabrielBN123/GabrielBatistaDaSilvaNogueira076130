@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, UserPlus, Mail, Phone, MapPin, Users, ArrowRight, Plus } from 'lucide-react';
+import { Search, Mail, Phone, MapPin, Users, ArrowRight, Plus } from 'lucide-react';
 import { CustomPagination } from '@/components/ui/custom-pagination';
 import type { Tutor } from '@/interfaces/tutor.interface';
 
