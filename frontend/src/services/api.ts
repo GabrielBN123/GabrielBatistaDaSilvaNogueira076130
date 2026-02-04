@@ -66,10 +66,14 @@ api.interceptors.response.use(
           return api(originalRequest);
         } else {
           processQueue(error, null);
+          AuthFacade.logout();
+          window.location.href = "/login";
           return Promise.reject(error);
         }
       } catch (refreshError) {
         processQueue(refreshError, null);
+        AuthFacade.logout();
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

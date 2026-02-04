@@ -14,10 +14,10 @@ export class AuthFacade {
 
   public static getUserFromStorage(): User | null {
     try {
-      const data = localStorage.getItem(AuthFacade.USER_KEY);
+      const data = sessionStorage.getItem(AuthFacade.USER_KEY);
       return data ? JSON.parse(data) : null;
     } catch (error) {
-      localStorage.removeItem(AuthFacade.USER_KEY);
+      sessionStorage.removeItem(AuthFacade.USER_KEY);
       return null;
     }
   }
@@ -36,9 +36,9 @@ export class AuthFacade {
       groups: decoded.groups
     };
 
-    localStorage.setItem(this.ACCESS_TOKEN_KEY, access_token);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, refresh_token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    sessionStorage.setItem(this.ACCESS_TOKEN_KEY, access_token);
+    sessionStorage.setItem(this.REFRESH_TOKEN_KEY, refresh_token);
+    sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));
 
     this.userSubject.next(user);
     return user;
@@ -62,10 +62,10 @@ export class AuthFacade {
 
       const { access_token, refresh_token: newRefreshToken } = response.data;
 
-      localStorage.setItem(this.ACCESS_TOKEN_KEY, access_token);
+      sessionStorage.setItem(this.ACCESS_TOKEN_KEY, access_token);
 
       if (newRefreshToken) {
-        localStorage.setItem(this.REFRESH_TOKEN_KEY, newRefreshToken);
+        sessionStorage.setItem(this.REFRESH_TOKEN_KEY, newRefreshToken);
       }
 
       return access_token;
@@ -77,18 +77,18 @@ export class AuthFacade {
   }
 
   static logout(): void {
-    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
+    sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    sessionStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    sessionStorage.removeItem(this.USER_KEY);
     this.userSubject.next(null);
   }
 
   static getAccessToken(): string | null {
-    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    return sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
   static isTokenValid(): boolean {
-    const token = localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    const token = sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
     if (!token) return false;
 
     try {

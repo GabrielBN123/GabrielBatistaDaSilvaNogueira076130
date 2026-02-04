@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         async function initializeAuth() {
             try {
-                // tenta pegar o usuário salvo (independente da validade do token por enquanto)
                 const storedUser = AuthFacade.getUserFromStorage();
 
                 if (!storedUser) {
@@ -33,17 +32,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     return;
                 }
 
-                // verifica se o Token de Acesso ainda é válido
                 const isValid = AuthFacade.isTokenValid();
 
                 if (isValid) {
-                    // Tudo certo, restaura o usuário
                     if (mounted) setUser(storedUser);
                 } else {
-                    // Token expirado. Tenta renovar via Refresh Token.
                     console.log("Token expirado. Tentando refresh...");
-                    
-                    // Nota: Verifique se o refreshSession retorna o token string ou boolean
+
                     const newToken = await AuthFacade.refreshSession();
 
                     if (newToken && mounted) {
@@ -51,7 +46,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         setUser(freshUser);
                         console.log("Sessão restaurada com sucesso.");
                     } else {
-                        // falhou
                         throw new Error("Refresh failed");
                     }
                 }
@@ -77,36 +71,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
-        // Função de monitoramento
         const checkTokenExpiration = async () => {
-            if (!user) return; // Só verifica se tiver usuário logado
+            if (!user) return;
 
             const secondsLeft = AuthFacade.getSecondsToExpiry();
-            
-            // Regra 1: Se faltar menos de 2 minutos, tenta renovar silenciosamente (Auto-Refresh)
-            if (secondsLeft < 120 && secondsLeft > 0) {
-                console.log("Token expirando em breve. Renovando automaticamente...");
+
+            if (secondsLeft <= 0) {
+                console.log("Token expirado (tempo esgotado). Tentando refresh ou logout...");
+
                 const newToken = await AuthFacade.refreshSession();
+
                 if (!newToken) {
-                    // Se falhar o auto-refresh, avisa o usuário que a sessão vai cair
-                    toast.warning("Sua sessão expirou. Por favor, faça login novamente.");
-                    setUser(null);
+                    console.log("Não foi possível renovar. Encerrando sessão.");
+                    AuthFacade.logout();
+                    toast.warning("Sua sessão expirou.");
                 }
-            } 
-            
-            // Regra 2: Se já expirou (0 segundos), faz logout
-            else if (secondsLeft === 0) {
-                console.log("Token expirado. Encerrando sessão.");
-                setUser(null);
-                AuthFacade.logout();
+                return;
+            }
+
+            if (secondsLeft < 120) {
+                console.log("Renovando token preventivamente...");
+                await AuthFacade.refreshSession();
             }
         };
 
-        // Roda a verificação imediatamente e depois a cada 30 segundos
-        checkTokenExpiration(); // Checa ao montar
+        checkTokenExpiration();
         const intervalId = setInterval(checkTokenExpiration, 30 * 1000);
 
-        return () => clearInterval(intervalId); // Limpa ao desmontar
+        return () => clearInterval(intervalId);
     }, [user]);
 
     async function signIn(email: string, pass: string) {
