@@ -15,6 +15,7 @@ export function PetList() {
     const [pets, setPets] = useState<Pet[]>([]);
     const [loading, setLoading] = useState(true);
     const [nome, setNome] = useState('');
+    const [raca, setRaca] = useState('');
 
     const [page, setPage] = useState(0);
     const [pageCount, setPageCount] = useState(0);
@@ -22,12 +23,12 @@ export function PetList() {
 
     useEffect(() => {
         carregarDados();
-    }, [nome, page]);
+    }, [nome, page, raca]);
 
     async function carregarDados() {
         setLoading(true);
         try {
-            const { data, total } = await PetFacade.getAll(nome, page, '', ITENS_POR_PAGINA);
+            const { data, total } = await PetFacade.getAll(nome, page, raca, ITENS_POR_PAGINA);
             const lista = data.content ? data.content : data;
 
             setPets(lista as Pet[]);
@@ -70,9 +71,18 @@ export function PetList() {
                         <div className="relative group">
                             <Input
                                 type="text"
-                                placeholder="Procurar amigo..."
+                                placeholder="Nome do Pet"
                                 value={nome}
                                 onChange={handleSearch}
+                                icon={Search}
+                            />
+                        </div>
+                        <div className="relative group">
+                            <Input
+                                type="text"
+                                placeholder="Raça do Pet"
+                                value={raca}
+                                onChange={(val) => setRaca(val)}
                                 icon={Search}
                             />
                         </div>
